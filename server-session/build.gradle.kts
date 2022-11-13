@@ -9,6 +9,8 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    id("io.vertx.vertx-plugin") version "1.1.1"
+
 }
 
 repositories {
@@ -22,9 +24,17 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:29.0-jre")
+
+//    implementation("io.vertx:vertx-core:4.3.4")
+    implementation("io.vertx:vertx-web:4.3.4")
+}
+
+vertx {
+    mainVerticle = "multiplayer.minesweeper.App"
 }
 
 application {
     // Define the main class for the application.
     mainClass.set("multiplayer.minesweeper.App")
+
 }
