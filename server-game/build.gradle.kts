@@ -27,6 +27,9 @@ dependencies {
 
 //    implementation("io.vertx:vertx-core:4.3.4")
     implementation("io.vertx:vertx-web:4.3.4")
+
+    implementation("com.corundumstudio.socketio:netty-socketio:1.7.22")
+
 }
 
 vertx {
