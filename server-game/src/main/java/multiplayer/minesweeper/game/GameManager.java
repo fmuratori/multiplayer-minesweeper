@@ -28,19 +28,18 @@ public class GameManager {
         this.grid = new TileContent[height][width];
         this.gridState = new TileState[height][width];
 
+        // add mines at random positions inside the grid
+        int num_mines = (int)((width / height) * difficulty.value);
+        Random rand = new Random(System.currentTimeMillis());
+        IntStream
+                .range(0,num_mines)
+                .map(i -> rand.nextInt(width * height))
+                .mapToObj(i -> new Point(i / height, i % height))
+                .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
+
         for(int i = 0; i < width; i++) {
             for(int j = 0; j < height; j++) {
                 gridState[i][j] = TileState.NOT_VISITED;
-
-                // add mines at random positions inside the grid
-                int num_mines = (int)((width / height) * difficulty.value);
-                Random rand = new Random(System.currentTimeMillis());
-                IntStream
-                        .range(0,num_mines)
-                        .map(i -> rand.nextInt(width * height))
-                        .mapToObj(i -> new Point(i / height, i % height))
-                        .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
-
                 // automatically generate the "final grid" and initialize a new grid for visited tiles
                 AtomicInteger near_mines = new AtomicInteger();
                 Stream.of(
