@@ -1,5 +1,5 @@
 package multiplayer.minesweeper.game;
 
 public enum TileState {
-    VISITED, NOT_VISITED, FLAG, EXPLOSION
+    VISITED, NOT_VISITED, FLAGGED, EXPLODED
 }

@@ -1,7 +1,7 @@
 package multiplayer.minesweeper.game;
 
-import java.awt.*;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -24,33 +24,52 @@ public class GameManager {
     /**
      * Initializes the game, creates and defines the positions of mines in the grid
      */
-    public synchronized void initialize() {
+    public synchronized void initialize(Optional<Long> seed) {
         this.grid = new TileContent[height][width];
         this.gridState = new TileState[height][width];
 
         // add mines at random positions inside the grid
         int num_mines = (int)((width / height) * difficulty.value);
-        Random rand = new Random(System.currentTimeMillis());
+        Random rand = new Random(seed.orElseGet(System::currentTimeMillis));
         IntStream
                 .range(0,num_mines)
                 .map(i -> rand.nextInt(width * height))
-                .mapToObj(i -> new Point(i / height, i % height))
+                .mapToObj(i -> new Coordinate(i / height, i % height))
                 .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
 
+        this.precomputeGridContent();
+    }
+
+    /**
+     * Initializes the game and provides the configuration of mines in a game.
+     * This is a testing method.
+     */
+    public synchronized void initialize(List<Coordinate> mines_positions) {
+        this.grid = new TileContent[height][width];
+        this.gridState = new TileState[height][width];
+
+        // add mines at random positions inside the grid
+        mines_positions
+                .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
+
+        this.precomputeGridContent();
+    }
+
+    private void precomputeGridContent() {
         for(int i = 0; i < width; i++) {
             for(int j = 0; j < height; j++) {
                 gridState[i][j] = TileState.NOT_VISITED;
                 // automatically generate the "final grid" and initialize a new grid for visited tiles
                 AtomicInteger near_mines = new AtomicInteger();
                 Stream.of(
-                    new Point(i-1, j-1),
-                    new Point(i-1, j),
-                    new Point(i-1, j+1),
-                    new Point(i, j-1),
-                    new Point(i, j+1),
-                    new Point(i+1, j-1),
-                    new Point(i+1, j),
-                    new Point(i+1, j+1)
+                        new Coordinate(i-1, j-1),
+                        new Coordinate(i-1, j),
+                        new Coordinate(i-1, j+1),
+                        new Coordinate(i, j-1),
+                        new Coordinate(i, j+1),
+                        new Coordinate(i+1, j-1),
+                        new Coordinate(i+1, j),
+                        new Coordinate(i+1, j+1)
                 ).parallel().forEach(c -> {
                     if (c.x >= 0 && c.y < width && c.y >= 0 && c.y < height) {
                         if (grid[c.x][c.y] == TileContent.MINE)
@@ -72,22 +91,64 @@ public class GameManager {
         }
     }
 
-    public synchronized ActionResult action(int x, int y) {
-        if (gridState[x][y] != TileState.NOT_VISITED)
+    public synchronized ActionResult action(int x, int y, ActionType actionType) {
+        if (gridState[x][y] != TileState.NOT_VISITED && gridState[x][y] != TileState.FLAGGED )
             throw new IllegalArgumentException("Tile (" + x + ", " + y + ") already visited");
+
+        if (actionType == ActionType.VISIT) {
+
+            // game lost
+            if (grid[x][y] == TileContent.MINE) {
+                gridState[x][y] = TileState.EXPLODED;
+                return ActionResult.EXPLOSION;
+            }
+
+            // expand the visited area if an empty tile is selected
+            this.visitAndExpand(x, y);
+
+            // check for game over (all tiles are visited or flagged currectly)
+            if (this.checkGameOver())
+                return ActionResult.GAME_OVER;
+
+        } else if (actionType == ActionType.FLAG) {
+            gridState[x][y] = TileState.FLAGGED;
+        }
+        return ActionResult.OK;
+    }
+
+    private void visitAndExpand(int x, int y) {
+        if (!(x >= 0 && x < this.width && y >= 0 && y < this.height))
+            return;
+        if (gridState[x][y] == TileState.VISITED)
+            return;
 
         gridState[x][y] = TileState.VISITED;
 
-        // game lost
-        if (grid[x][y] == TileContent.MINE)
-            return ActionResult.EXPLOSION;
+        if (grid[x][y] == TileContent.EMPTY) {
+            visitAndExpand(x+1, y);
+            visitAndExpand(x-1, y);
+            visitAndExpand(x, y+1);
+            visitAndExpand(x, y-1);
+            visitAndExpand(x+1, y+1);
+            visitAndExpand(x+1, y-1);
+            visitAndExpand(x-1, y+1);
+            visitAndExpand(x-1, y-1);
+        }
+    }
 
-        // expand the visited area if an empty tile is selected
-
-        // check for game over (all tiles are visited or flagged currectly)
-
-
-        return ActionResult.OK;
+    /**
+     * Check if the game is ended. A game ends when every non-mine tile has been visited.
+     * @return true if the game is over and the player has won, false if the game is not over and
+     * tiles still need to be visited
+     */
+    public boolean checkGameOver() {
+        for(int i = 0; i < width; i++) {
+            for(int j = 0; j < height; j++) {
+                if (gridState[i][j] != TileState.VISITED && grid[i][j] != TileContent.MINE)
+                    return false;
+            }
+        }
+        return true;
     }
 
     /**
