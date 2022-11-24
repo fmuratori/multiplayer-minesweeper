@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // Use JUnit test framework.
-    testImplementation("junit:junit:4.13")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:29.0-jre")
