@@ -1,5 +1,6 @@
 package multiplayer.minesweeper.game;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -11,20 +12,21 @@ public class GameManager {
 
     private final int width;
     private final int height;
-    private final GameDifficulty difficulty;
+
     private TileContent[][] grid;
     private TileState[][] gridState;
 
-    public GameManager(int width, int height, GameDifficulty difficulty) {
+    private boolean gameOverFlag = false;
+
+    public GameManager(int width, int height) {
         this.width = width;
         this.height = height;
-        this.difficulty = difficulty;
     }
 
     /**
      * Initializes the game, creates and defines the positions of mines in the grid
      */
-    public synchronized void initialize(Optional<Long> seed) {
+    public synchronized void initialize(Optional<Long> seed, GameDifficulty difficulty) {
         this.grid = new TileContent[height][width];
         this.gridState = new TileState[height][width];
 
@@ -48,6 +50,12 @@ public class GameManager {
         this.grid = new TileContent[height][width];
         this.gridState = new TileState[height][width];
 
+        // fill matrices with default values
+        for (TileContent[] row : grid)
+            Arrays.fill(row, TileContent.EMPTY);
+        for (TileState[] row : gridState)
+            Arrays.fill(row, TileState.NOT_VISITED);
+
         // add mines at random positions inside the grid
         mines_positions
                 .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
@@ -56,9 +64,11 @@ public class GameManager {
     }
 
     private void precomputeGridContent() {
-        for(int i = 0; i < width; i++) {
-            for(int j = 0; j < height; j++) {
-                gridState[i][j] = TileState.NOT_VISITED;
+        for(int i = 0; i < height; i++) {
+            for(int j = 0; j < width; j++) {
+                if (grid[i][j] == TileContent.MINE)
+                    continue;
+
                 // automatically generate the "final grid" and initialize a new grid for visited tiles
                 AtomicInteger near_mines = new AtomicInteger();
                 Stream.of(
@@ -71,7 +81,7 @@ public class GameManager {
                         new Coordinate(i+1, j),
                         new Coordinate(i+1, j+1)
                 ).parallel().forEach(c -> {
-                    if (c.x >= 0 && c.y < width && c.y >= 0 && c.y < height) {
+                    if (c.x >= 0 && c.x < height && c.y >= 0 && c.y < width) {
                         if (grid[c.x][c.y] == TileContent.MINE)
                             near_mines.getAndIncrement();
                     }
@@ -91,48 +101,68 @@ public class GameManager {
         }
     }
 
+    /**
+     * Execute an action on the game grid at a given coordinate.
+     *
+     * @param x the row coordinate
+     * @param y the column coordinate
+     * @param actionType the action to be executed
+     *
+     * @return the result of an action.
+     */
     public synchronized ActionResult action(int x, int y, ActionType actionType) {
-        if (gridState[x][y] != TileState.NOT_VISITED && gridState[x][y] != TileState.FLAGGED )
-            throw new IllegalArgumentException("Tile (" + x + ", " + y + ") already visited");
 
-        if (actionType == ActionType.VISIT) {
+        if (gameOverFlag || (gridState[x][y] != TileState.NOT_VISITED && gridState[x][y] != TileState.FLAGGED))
+            return ActionResult.IGNORED;
 
-            // game lost
-            if (grid[x][y] == TileContent.MINE) {
-                gridState[x][y] = TileState.EXPLODED;
-                return ActionResult.EXPLOSION;
-            }
+        switch (actionType) {
+            case UNFLAG:
+                gridState[x][y] = TileState.NOT_VISITED;
+                return ActionResult.OK;
+            case VISIT:
+                // game lost
+                if (grid[x][y] == TileContent.MINE) {
+                    gameOverFlag = true;
+                    gridState[x][y] = TileState.EXPLODED;
+                    return ActionResult.EXPLOSION;
+                }
 
-            // expand the visited area if an empty tile is selected
-            this.visitAndExpand(x, y);
+                // expand the visited area if an empty tile is selected
+                this.visitAndExpand(x, y);
 
-            // check for game over (all tiles are visited or flagged currectly)
-            if (this.checkGameOver())
-                return ActionResult.GAME_OVER;
-
-        } else if (actionType == ActionType.FLAG) {
-            gridState[x][y] = TileState.FLAGGED;
+                // check for game over (all tiles are visited or flagged correctly)
+                if (this.checkGameOver()) {
+                    gameOverFlag = true;
+                    return ActionResult.GAME_OVER;
+                }
+                return ActionResult.OK;
+            case FLAG:
+                gridState[x][y] = TileState.FLAGGED;
+                return ActionResult.OK;
+            default:
+                return ActionResult.IGNORED;
         }
-        return ActionResult.OK;
     }
 
     private void visitAndExpand(int x, int y) {
         if (!(x >= 0 && x < this.width && y >= 0 && y < this.height))
             return;
+
+        // TODO: valutare se rimuovere seguente if
         if (gridState[x][y] == TileState.VISITED)
             return;
 
-        gridState[x][y] = TileState.VISITED;
+        if (grid[x][y] != TileContent.MINE) {
 
-        if (grid[x][y] == TileContent.EMPTY) {
+            gridState[x][y] = TileState.VISITED;
             visitAndExpand(x+1, y);
             visitAndExpand(x-1, y);
             visitAndExpand(x, y+1);
             visitAndExpand(x, y-1);
-            visitAndExpand(x+1, y+1);
-            visitAndExpand(x+1, y-1);
-            visitAndExpand(x-1, y+1);
-            visitAndExpand(x-1, y-1);
+//            visitAndExpand(x+1, y+1);
+//            visitAndExpand(x+1, y-1);
+//            visitAndExpand(x-1, y+1);
+//            visitAndExpand(x-1, y-1);
         }
     }
 
@@ -156,5 +186,13 @@ public class GameManager {
      */
     public synchronized String toString() {
         return "";
+    }
+
+    public TileContent[][] getGrid() {
+        return grid;
+    }
+
+    public TileState[][] getGridState() {
+        return gridState;
     }
 }

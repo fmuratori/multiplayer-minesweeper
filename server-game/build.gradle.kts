@@ -21,6 +21,7 @@ repositories {
 dependencies {
     // Use JUnit test framework.
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:29.0-jre")
@@ -40,4 +41,8 @@ application {
     // Define the main class for the application.
     mainClass.set("multiplayer.minesweeper.App")
 
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

@@ -1,5 +1,5 @@
 package multiplayer.minesweeper.game;
 
 public enum ActionResult {
-    OK, EXPLOSION, GAME_OVER
+    OK, EXPLOSION, IGNORED, GAME_OVER
 }

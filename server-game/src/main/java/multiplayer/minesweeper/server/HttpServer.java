@@ -8,7 +8,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 
-public class App extends AbstractVerticle {
+public class HttpServer extends AbstractVerticle {
     @Override
     public void start() throws Exception {
         // Create a Router

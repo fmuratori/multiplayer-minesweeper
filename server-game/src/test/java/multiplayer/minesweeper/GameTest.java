@@ -1,43 +1,108 @@
 package multiplayer.minesweeper;
 
 
+import multiplayer.minesweeper.game.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class GameTest {
 
+    private GameManager gameManager = null;
+    private final int GRID_WIDTH = 4;
+    private final int GRID_HEIGHT = 4;
+
     @BeforeEach
-    public void setup() {
-
+    void initialize() {
+        List<Coordinate> minesList = List.of(
+                new Coordinate(0, 0),
+                new Coordinate(1, 1),
+                new Coordinate(2, 0));
+        gameManager = new GameManager(GRID_WIDTH, GRID_HEIGHT);
+        gameManager.initialize(minesList);
     }
 
     @Test
-    public void testInitialization() {
+    void testInitialization() {
+        assertSame(gameManager.getGrid()[0][0], TileContent.MINE);
+        assertSame(gameManager.getGrid()[1][1], TileContent.MINE);
+        assertSame(gameManager.getGrid()[2][0], TileContent.MINE);
+        assertSame(gameManager.getGrid()[0][1], TileContent.NEAR_2);
+        assertSame(gameManager.getGrid()[1][0], TileContent.NEAR_3);
+        assertSame(gameManager.getGrid()[2][2], TileContent.NEAR_1);
+        assertSame(gameManager.getGrid()[2][1], TileContent.NEAR_2);
 
+        for (int i  = 0; i < GRID_HEIGHT; i++)
+            for (int j  = 0; j < GRID_WIDTH; j++)
+                assertSame(gameManager.getGridState()[i][j], TileState.NOT_VISITED);
     }
 
     @Test
-    public void testAction() {
+    public void testVisitAction() {
+        ActionResult result = gameManager.action(1, 0, ActionType.VISIT);
+        assertEquals(result, ActionResult.OK);
+
+        int visitedTiles = 0;
+        for (int i  = 0; i < GRID_HEIGHT; i++)
+            for (int j  = 0; j < GRID_WIDTH; j++)
+                if (gameManager.getGridState()[i][j] == TileState.VISITED) visitedTiles++;
+
+        assertEquals(visitedTiles, 1);
 
     }
-
     @Test
-    public void testMineAction() {
+    public void testVisitActionWithExpansion() {
+        ActionResult result = gameManager.action(3, 3, ActionType.VISIT);
+        assertEquals(result, ActionResult.OK);
 
+        int visitedTiles = 0;
+        for (int i  = 0; i < GRID_HEIGHT; i++)
+            for (int j  = 0; j < GRID_WIDTH; j++)
+                if (gameManager.getGridState()[i][j] == TileState.VISITED) visitedTiles++;
+
+        assertEquals(visitedTiles, 12); // 4*4 tiles - (3 mines + 1 isolated tile)
     }
 
     @Test
     public void testFlagAction() {
+        ActionResult result = gameManager.action(0, 0, ActionType.FLAG);
+        assertEquals(result, ActionResult.OK);
+        assertEquals(gameManager.getGridState()[0][0], TileState.FLAGGED);
 
+        ActionResult result2 = gameManager.action(0, 0, ActionType.FLAG);
+        assertEquals(result2, ActionResult.OK);
+        assertEquals(gameManager.getGridState()[0][0], TileState.FLAGGED);
+
+        ActionResult result3 = gameManager.action(0, 1, ActionType.FLAG);
+        assertEquals(result3, ActionResult.OK);
+        assertEquals(gameManager.getGridState()[0][1], TileState.FLAGGED);
     }
 
     @Test
-    public void testActionWithExpansion() {
+    public void testActionWithExplosion() {
+        ActionResult result = gameManager.action(0, 0, ActionType.VISIT);
+        assertEquals(result, ActionResult.EXPLOSION);
+        assertEquals(gameManager.getGridState()[0][0], TileState.EXPLODED);
 
+        ActionResult result2 = gameManager.action(1, 1, ActionType.VISIT);
+        assertEquals(result2, ActionResult.IGNORED);
     }
 
     @Test
     public void testGameOver() {
-
+        gameManager.action(3, 3, ActionType.VISIT);
+        ActionResult result = gameManager.action(1, 0, ActionType.VISIT);
+        assertEquals(result, ActionResult.GAME_OVER);
     }
+
+
+//    @Test
+//    public void testFirstActionIsExplosion() {
+//
+//    }
 }
