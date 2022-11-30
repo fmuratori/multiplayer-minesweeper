@@ -1,13 +1,16 @@
 package multiplayer.minesweeper;
 
-import java.util.Arrays;
+import io.vertx.core.Vertx;
+import multiplayer.minesweeper.server.HttpServer;
 
 public class Main {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
-        // start socketio server
+        // start socket.io server
 
         // start http server
+        Vertx vertx = Vertx.vertx();
+        vertx.deployVerticle(new HttpServer());
 
     }
 }
