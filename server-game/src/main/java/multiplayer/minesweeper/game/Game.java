@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class GameManager {
+public class Game {
 
     private final int width;
     private final int height;
@@ -18,7 +18,7 @@ public class GameManager {
 
     private boolean gameOverFlag = false;
 
-    public GameManager(int width, int height) {
+    public Game(int width, int height) {
         this.width = width;
         this.height = height;
     }

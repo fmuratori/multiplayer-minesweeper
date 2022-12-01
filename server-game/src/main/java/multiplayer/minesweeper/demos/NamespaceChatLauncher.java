@@ -1,4 +1,4 @@
-package multiplayer.minesweeper.socket;
+package multiplayer.minesweeper.demos;
 
 import com.corundumstudio.socketio.*;
 

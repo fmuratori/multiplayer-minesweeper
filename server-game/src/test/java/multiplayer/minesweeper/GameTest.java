@@ -6,14 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
 
-    private GameManager gameManager = null;
+    private Game gameManager = null;
     private final int GRID_WIDTH = 4;
     private final int GRID_HEIGHT = 4;
 
@@ -23,7 +22,7 @@ public class GameTest {
                 new Coordinate(0, 0),
                 new Coordinate(1, 1),
                 new Coordinate(2, 0));
-        gameManager = new GameManager(GRID_WIDTH, GRID_HEIGHT);
+        gameManager = new Game(GRID_WIDTH, GRID_HEIGHT);
         gameManager.initialize(minesList);
     }
 

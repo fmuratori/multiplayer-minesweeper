@@ -7,28 +7,37 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import multiplayer.minesweeper.game.GameManager;
+import multiplayer.minesweeper.game.Game;
+import multiplayer.minesweeper.game.GamesManager;
+import multiplayer.minesweeper.socket.SocketServer;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class HttpServer extends AbstractVerticle {
-    private final Map<String, GameManager> activeGames = new HashMap<>();
+    private final static HttpServer instance = new HttpServer();
+    private final Map<String, Game> activeGames = new HashMap<>();
+
+    private HttpServer() {}
 
     private void createNewGame(RoutingContext rc) {
+        System.out.println("Received new-game request.");
+
         int gridWidth = rc.get("width", 4);
         int gridHeight = rc.get("height", 4);
 
-        String gameId = UUID.randomUUID().toString();
-        GameManager newInstance = new GameManager(gridWidth, gridHeight);
-        activeGames.put(gameId, newInstance);
+        String gameId = GamesManager.getInstance().newGame(gridWidth, gridHeight);
+
+        SocketServer.getInstance().registerNewRoom(gameId);
+
+        System.out.println("Created new-game, created Socketio room." + gameId);
+
         rc.response()
                 .putHeader("content-type",
                         "application/json; charset=utf-8")
                 .end(Json.encodePrettily(gameId));
     }
-
     @Override
     public void start() {
         // Create a Router
@@ -38,11 +47,15 @@ public class HttpServer extends AbstractVerticle {
 
         vertx.createHttpServer()
                 .requestHandler(router)
-                .listen(8888)
+                .listen(9001)
                 .onSuccess(server ->
                         System.out.println(
                                 "HTTP server started on port " + server.actualPort()
                         )
                 );
+    }
+
+    public static HttpServer getInstance() {
+        return instance;
     }
 }

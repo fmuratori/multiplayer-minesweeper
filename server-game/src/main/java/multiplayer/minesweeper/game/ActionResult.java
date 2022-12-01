@@ -1,5 +1,14 @@
 package multiplayer.minesweeper.game;
 
 public enum ActionResult {
-    OK, EXPLOSION, IGNORED, GAME_OVER
+    OK("OK"),
+    EXPLOSION("EXPLOSION"),
+    IGNORED("IGNORED"),
+    GAME_OVER("GAME_OVER");
+
+    public final String label;
+
+    private ActionResult(String label) {
+        this.label = label;
+    }
 }
