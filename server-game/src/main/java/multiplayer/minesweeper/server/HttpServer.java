@@ -13,7 +13,6 @@ import multiplayer.minesweeper.socket.SocketServer;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class HttpServer extends AbstractVerticle {
     private final static HttpServer instance = new HttpServer();
@@ -28,8 +27,6 @@ public class HttpServer extends AbstractVerticle {
         int gridHeight = rc.get("height", 4);
 
         String gameId = GamesManager.getInstance().newGame(gridWidth, gridHeight);
-
-        SocketServer.getInstance().registerNewRoom(gameId);
 
         System.out.println("Created new-game, created Socketio room." + gameId);
 

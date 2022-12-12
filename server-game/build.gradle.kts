@@ -29,7 +29,11 @@ dependencies {
     implementation("io.vertx:vertx-core:4.3.4")
     implementation("io.vertx:vertx-web:4.3.4")
 
-    implementation("com.corundumstudio.socketio:netty-socketio:1.7.22")
+    implementation("com.corundumstudio.socketio:netty-socketio:1.7.19")
+//    implementation("io.socket:socket.io-server:4.0.1")
+//    implementation("io.socket:engine.io-server:6.2.1")
+//    implementation("io.socket:engine.io-server-jetty:6.1.0")
+
 
 }
 

@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Game {
-
+    private static float MINES_RATE = 0.4f;
     private final int width;
     private final int height;
 
@@ -26,13 +26,13 @@ public class Game {
     /**
      * Initializes the game, creates and defines the positions of mines in the grid
      */
-    public synchronized void initialize(Optional<Long> seed, GameDifficulty difficulty) {
+    public synchronized void initialize() {
         this.grid = new TileContent[height][width];
         this.gridState = new TileState[height][width];
 
         // add mines at random positions inside the grid
-        int num_mines = (int)((width / height) * difficulty.value);
-        Random rand = new Random(seed.orElseGet(System::currentTimeMillis));
+        int num_mines = (int)((width / height) * MINES_RATE);
+        Random rand = new Random(System.currentTimeMillis());
         IntStream
                 .range(0,num_mines)
                 .map(i -> rand.nextInt(width * height))
@@ -172,8 +172,8 @@ public class Game {
      * tiles still need to be visited
      */
     public boolean checkGameOver() {
-        for(int i = 0; i < width; i++) {
-            for(int j = 0; j < height; j++) {
+        for(int i = 0; i < height; i++) {
+            for(int j = 0; j < width; j++) {
                 if (gridState[i][j] != TileState.VISITED && grid[i][j] != TileContent.MINE)
                     return false;
             }
@@ -185,7 +185,22 @@ public class Game {
      * Returns the current state of the grid as a matrix of integer values representing each tile type.
      */
     public synchronized String toString() {
-        return "";
+
+        String[] output = new String[height*width];
+
+        for(int i = 0; i < height; i++) {
+            for(int j = 0; j < width; j++) {
+                String value = null;
+                if (gridState[i][j] == TileState.VISITED) {
+                    value = grid[i][j].value;
+                } else {
+                    value = gridState[i][j].value;
+                }
+                output[ i*width + j] = value;
+            }
+        }
+
+        return String.join(" ", output);
     }
 
     public TileContent[][] getGrid() {

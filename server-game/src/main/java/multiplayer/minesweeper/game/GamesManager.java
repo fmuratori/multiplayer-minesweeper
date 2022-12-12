@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class GamesManager {
-    private static GamesManager instance = new GamesManager();
+    private static final GamesManager instance = new GamesManager();
     private final Map<String, Game> activeGames = new HashMap<>();
 
     private GamesManager() {}
@@ -15,7 +15,8 @@ public class GamesManager {
     }
 
     public String newGame(int gridWidth, int gridHeight) {
-        String gameId = UUID.randomUUID().toString();
+//        String gameId = UUID.randomUUID().toString();
+        String gameId = "test_room";
         Game newInstance = new Game(gridWidth, gridHeight);
 
         activeGames.put(gameId, newInstance);
