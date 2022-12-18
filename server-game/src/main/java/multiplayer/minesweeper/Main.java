@@ -12,7 +12,7 @@ public class Main {
         SocketServer.getInstance().initialize(8004);
 
         // start http server
-//        Vertx vertx = Vertx.vertx();
-//        vertx.deployVerticle(HttpServer.getInstance());
+        Vertx vertx = Vertx.vertx();
+        vertx.deployVerticle(HttpServer.getInstance());
     }
 }

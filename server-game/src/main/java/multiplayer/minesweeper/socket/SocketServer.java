@@ -26,20 +26,13 @@ public class SocketServer {
         config.setPort(port);
 
         server = new SocketIOServer(config);
-
-//        server.addEventInterceptor(new EventInterceptor() {
-//            @Override
-//            public void onEvent(NamespaceClient client, String eventName, List<Object> args, AckRequest ackRequest) {
-//                client.get
-//            }
-//        });
-
         server.addConnectListener((client) -> {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - Connected to socket");
         });
         server.addDisconnectListener(client -> {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - Disconnected from socket");
         });
+
         server.addEventListener("action", ActionObject.class, (client, data, ackSender) -> {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - " + data.toString());
 
@@ -51,6 +44,10 @@ public class SocketServer {
 
             ActionType requestedAction = ActionType.valueOf(data.getAction());
             ActionResult result = game.action(data.getxCoordinate(), data.getyCoordinate(), requestedAction);
+
+            if (result == ActionResult.IGNORED){
+                System.out.println("ASD");
+            }
 
             // broadcast messages to all clients
             String map = game.toString();

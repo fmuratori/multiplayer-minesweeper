@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import React, { useState } from 'react';
-import {SocketContext} from '../scripts/SocketIOContext';
+import {SocketContext} from '../scripts/GameSocket';
 import './Game.css';
 
 function Game() {

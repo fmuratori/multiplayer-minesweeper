@@ -44,7 +44,7 @@ public class HttpServer extends AbstractVerticle {
 
         vertx.createHttpServer()
                 .requestHandler(router)
-                .listen(9001)
+                .listen(8003)
                 .onSuccess(server ->
                         System.out.println(
                                 "HTTP server started on port " + server.actualPort()
