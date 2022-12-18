@@ -1,13 +1,13 @@
 package multiplayer.minesweeper.socket;
 
 import com.corundumstudio.socketio.*;
+import multiplayer.minesweeper.client.RestAPIClient;
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.sessions.SessionsManager;
 import multiplayer.minesweeper.socket.in.LeaveRoomObject;
 import multiplayer.minesweeper.socket.in.JoinRoomObject;
 import multiplayer.minesweeper.socket.out.*;
 
-import java.util.List;
 import java.util.Optional;
 
 public class SocketServer {
@@ -16,8 +16,14 @@ public class SocketServer {
     private SocketIOServer server;
     private SocketIONamespace browseNamespace;
     private SocketIONamespace sessionNamespace;
+    private RestAPIClient gameClient;
 
     private SocketServer() {}
+
+
+    public void setGameClient(RestAPIClient gameClient) {
+        this.gameClient = gameClient;
+    }
 
     public void initialize(int port) {
         Configuration config = new Configuration();
@@ -57,8 +63,9 @@ public class SocketServer {
 
                 if (connectedClients == session.get().getGameMode().getNumPlayers()) {
                     System.out.println("Starting game for room " + roomName);
-                    sessionNamespace.getRoomOperations(roomName).sendEvent("game_starting",
-                            new GameStartingObject());
+
+                    gameClient.sendGameRequest(roomName, session.get());
+
                     browseNamespace.getBroadcastOperations()
                             .sendEvent("session_update",
                                     new SessionUpdateObject(session.get(), "GAME_STARTING"));
@@ -121,6 +128,15 @@ public class SocketServer {
     public void close() {
         System.out.println("Terminating Socket.IO server");
         server.stop();
+    }
+
+    public void gameStartingResponse(String sessionRoomName, String gameRoomName) {
+        Optional<Session> session = SessionsManager.getInstance().getSession(sessionRoomName);
+        if (session.isPresent())
+            sessionNamespace
+                .getRoomOperations(sessionRoomName)
+                .sendEvent("game_starting",
+                        new GameStartingObject(gameRoomName, session.get()));
     }
 
     public static SocketServer getInstance() {

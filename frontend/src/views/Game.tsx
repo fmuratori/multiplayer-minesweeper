@@ -2,47 +2,47 @@ import { useContext, useEffect } from 'react';
 import React, { useState } from 'react';
 import {SocketContext} from '../scripts/GameSocket';
 import './Game.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function Game() {
   const socket:any = useContext(SocketContext);
-  var [gridWidth, setGridWidth] = useState(4);
-  var [gridHeight, setGridHeight] = useState(4);
+  
+  // const [gameData, setGameData] = useState({
+  //   gameOverFlag: false,
+  //   gameWonFlag: false
+  // })
+
   var [gameOverFlag, setGameOverFlag] = useState(false);
   var [gameWonFlag, setGameWonFlag] = useState(false);
   var [map, setMap] = useState(null);
   var [gameStartTime, setGameStartTime] = useState(new Date());
-  
-  useEffect(() => {
-    // set the empty grid
-    var map: string[][] = [];
-    for (var i = 0; i < gridWidth; i++) {
-      var row: string[] = [];
-      for (var j = 0; j < gridHeight; j++) {
-        row[j] = "";
-      }
-      map[i] = row;
-    }
-    setMap(map);
 
-    // setup socket messages handlers
-    socket.on('new_connection', (count: number) => {
-      console.log("new_connection", count);
-    });
-    socket.on('game_won', (data: { map: string }) => {
-      console.log("game_won", data["map"]);
-      updateMap(data["map"]);
-      gameOverFlag = true;
-      gameWonFlag = true;
-    });
-    socket.on('game_lost', (data: { map: string }) => {
-      console.log("game_lost", data["map"]);
-      updateMap(data["map"]);
-      gameOverFlag = true;
-    });
-    socket.on('game_update', (data: { map: string }) => {
-      console.log("game_update", data["map"]);
-      updateMap(data["map"]);
-    });
+  const {state} = useLocation();
+  const navigate = useNavigate();
+
+  socket.on('new_connection', (count: number) => {
+    console.log("new_connection", count);
+  });
+  socket.on('game_won', (data: { map: string }) => {
+    console.log("game_won", data["map"]);
+    updateMap(data["map"]);
+    gameOverFlag = true;
+    gameWonFlag = true;
+  });
+  socket.on('game_lost', (data: { map: string }) => {
+    console.log("game_lost", data["map"]);
+    updateMap(data["map"]);
+    gameOverFlag = true;
+  });
+  socket.on('game_update', (data: { map: string }) => {
+    console.log("game_update", data["map"]);
+    updateMap(data["map"]);
+  });
+
+  socket.emit("join_room", state.roomName)
+
+  useEffect(() => {
+    setEmptyGrid();
 
     return () => {
       socket.off('new_connection');
@@ -52,13 +52,26 @@ function Game() {
     };
   }, []);
 
+  function setEmptyGrid() {
+    // set the empty grid
+    var map: string[][] = [];
+    for (var i = 0; i < state.session.gridWidth; i++) {
+      var row: string[] = [];
+      for (var j = 0; j < state.session.gridWidth; j++) {
+        row[j] = "";
+      }
+      map[i] = row;
+    }
+    setMap(map);
+  }
+
   function updateMap(newStringMap:string) {
     var tilesList: string[] = newStringMap.split(" ");
     var map: string[][] = [];
-    for (var i = 0; i < gridWidth; i++) {
+    for (var i = 0; i < state.session.gridWidth; i++) {
       var row: string[] = [];
-      for (var j = 0; j < gridHeight; j++) {
-        row[j] = tilesList[i*gridWidth + j];
+      for (var j = 0; j < state.session.gridHeight; j++) {
+        row[j] = tilesList[i*state.session.gridWidth + j];
       }
       map[i] = row;
     }
@@ -93,7 +106,7 @@ function Game() {
       return
 
     var content = [];
-    for (var i = 0; i < gridHeight; i++) {
+    for (var i = 0; i < state.session.gridHeight; i++) {
       content.push(
         <tr key={"row-" + i}>
           { drawRow(i, map[i]) }
@@ -104,7 +117,7 @@ function Game() {
   }
   function drawRow(rowNumber:number, row: any) {
     var content = [];
-    for (let j = 0; j < gridWidth; j++) {
+    for (let j = 0; j < state.session.gridWidth; j++) {
       content.push(
         <td key={"cell-" + j} className="game-tile text-center" onClick={(e) => action(e, rowNumber, j)} onContextMenu={(e) => action(e, rowNumber, j)}>
           { drawCellContent(row[j]) }

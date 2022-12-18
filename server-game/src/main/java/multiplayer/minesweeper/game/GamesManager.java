@@ -14,13 +14,11 @@ public class GamesManager {
         return instance;
     }
 
-    public String newGame(int gridWidth, int gridHeight) {
-//        String gameId = UUID.randomUUID().toString();
-        String gameId = "test_room";
-        Game newInstance = new Game(gridWidth, gridHeight);
-
+    public String newGame(int gridWidth, int gridHeight, float minesPercentage) {
+        String gameId = UUID.randomUUID().toString();
+        Game newInstance = new Game(gridWidth, gridHeight, minesPercentage);
+        newInstance.initialize();
         activeGames.put(gameId, newInstance);
-
         return gameId;
     }
 

@@ -4,40 +4,35 @@
 package multiplayer.minesweeper.server;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import multiplayer.minesweeper.game.Game;
 import multiplayer.minesweeper.game.GamesManager;
-import multiplayer.minesweeper.socket.SocketServer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class HttpServer extends AbstractVerticle {
     private final static HttpServer instance = new HttpServer();
-    private final Map<String, Game> activeGames = new HashMap<>();
 
     private HttpServer() {}
 
     private void createNewGame(RoutingContext rc) {
         System.out.println("Received new-game request.");
 
-        int gridWidth = rc.get("width", 4);
-        int gridHeight = rc.get("height", 4);
+        int gridWidth = rc.get("gridWidth", 4);
+        int gridHeight = rc.get("gridHeight", 4);
+        float minesPercentage = rc.get("minesPercentage", 0.4f);
+//        int numConnectedPlayers = rc.get("numConnectedPlayers");
+//        int numPlayers = rc.get("numPlayers");
 
-        String gameId = GamesManager.getInstance().newGame(gridWidth, gridHeight);
+        String gameId = GamesManager.getInstance().newGame(gridWidth, gridHeight, minesPercentage);
 
         System.out.println("Created new-game, created Socketio room." + gameId);
 
         rc.response()
                 .putHeader("content-type",
                         "application/json; charset=utf-8")
-                .end(Json.encodePrettily(gameId));
+                .end(gameId);
     }
     @Override
     public void start() {
-        // Create a Router
         Router router = Router.router(vertx);
 
         router.post("/new-game").handler(this::createNewGame);

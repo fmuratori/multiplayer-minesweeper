@@ -1,13 +1,11 @@
 import './WaitingStart.css';
 import { useEffect, useState } from 'react';
 import { sessionSocket } from '../scripts/SessionSocket'
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function WaitingStart() {
 
-  const [connectedCount, setConnectedCount] = useState(0);
-  const [maxPlayersCount, setMaxPlayersCount] = useState(0);
+  const [playersCount, setPlayersCount] = useState({connectedCount: 0, maxPlayersCount: 0});
   const {state} = useLocation();
   const navigate = useNavigate();
 
@@ -18,15 +16,13 @@ function WaitingStart() {
   sessionSocket.on('disconnect', () => {
     console.log('SocketIo [SESSION] - Disconnect from server-session');
   });
-  sessionSocket.on('game_starting', () => {
-    console.log('SocketIo [SESSION] - Game starting update');
-    navigate('/game');
+  sessionSocket.on('game_starting', (data:any) => {
+    console.log('SocketIo [SESSION] - Game starting update', data);
+    navigate('/game', { state: data });
   });
   sessionSocket.on('players_count_update', (data: any) => {
     console.log('SocketIo - Players count update', data);
-    // TODO: collapse connectedCount and maxPlayersCount into 1 component object
-    setConnectedCount(data['connectedCount'])
-    setMaxPlayersCount(data['maxPlayersCount'])
+    setPlayersCount(data)
   });
   sessionSocket.on('session_error', (data: any) => {
     console.log('SocketIo - Session error', data);
@@ -71,7 +67,7 @@ function WaitingStart() {
                   </h2>
                   <div className='text-center'>
                     <h2>
-                        Giocatori {connectedCount} / {maxPlayersCount}
+                        Giocatori {playersCount.connectedCount} / {playersCount.maxPlayersCount}
                     </h2>
                   </div>
                   <div className='d-flex justify-content-center'>

@@ -2,14 +2,13 @@ package multiplayer.minesweeper.game;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Game {
-    private static float MINES_RATE = 0.4f;
+    private float minesPercentage = 0.4f;
     private final int width;
     private final int height;
 
@@ -17,6 +16,12 @@ public class Game {
     private TileState[][] gridState;
 
     private boolean gameOverFlag = false;
+
+    public Game(int width, int height, float minesPercentage) {
+        this.width = width;
+        this.height = height;
+        this.minesPercentage = minesPercentage;
+    }
 
     public Game(int width, int height) {
         this.width = width;
@@ -31,7 +36,7 @@ public class Game {
         this.gridState = new TileState[height][width];
 
         // add mines at random positions inside the grid
-        int num_mines = (int)((width / height) * MINES_RATE);
+        int num_mines = (int)((width / height) * minesPercentage);
         Random rand = new Random(System.currentTimeMillis());
         IntStream
                 .range(0,num_mines)

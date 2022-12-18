@@ -31,6 +31,9 @@ public class SocketServer {
         });
         server.addDisconnectListener(client -> {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - Disconnected from socket");
+            // TODO: automatically remove user from game
+
+            // TODO: check if game has any active user. Delete the game otherwise.
         });
 
         server.addEventListener("action", ActionObject.class, (client, data, ackSender) -> {
@@ -45,10 +48,6 @@ public class SocketServer {
             ActionType requestedAction = ActionType.valueOf(data.getAction());
             ActionResult result = game.action(data.getxCoordinate(), data.getyCoordinate(), requestedAction);
 
-            if (result == ActionResult.IGNORED){
-                System.out.println("ASD");
-            }
-
             // broadcast messages to all clients
             String map = game.toString();
             switch (result) {
@@ -62,8 +61,6 @@ public class SocketServer {
                     server.getRoomOperations(roomId.get()).sendEvent("game_update", new GameUpdateObject(map));
                     break;
                 case IGNORED:
-                    // TODO: remove following
-                    server.getRoomOperations(roomId.get()).sendEvent("game_update", new GameUpdateObject(map));
                     break;
             }
         });
@@ -71,18 +68,25 @@ public class SocketServer {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - " + data.toString());
             // add user to one game sessione
             client.joinRoom(data.getRoomName());
-
-            // TODO: a game starts as soon as one player connects to the room. Instead wait for all players befor
-            //  starting
-            GamesManager.getInstance().getGameInstance(data.getRoomName()).initialize(
-                    Arrays.asList(new Coordinate(0, 1), new Coordinate(1, 0)));
+            Game game = GamesManager.getInstance().getGameInstance(data.getRoomName());
+            String map = game.toString();
+            client.sendEvent("game_update", new GameUpdateObject(map));
 
             // send new user connection to all connected users
-            int connectedClients = server.getRoomOperations(data.getRoomName()).getClients().size();
-            server.getRoomOperations(data.getRoomName()).sendEvent("new_connection",
-                    new NewConnectionObject(connectedClients));
+//            int connectedClients = server.getRoomOperations(data.getRoomName()).getClients().size();
+//            server.getRoomOperations(data.getRoomName()).sendEvent("connections_update",
+//                    new NewConnectionObject(connectedClients));
         });
+        server.addEventListener("leave_room", JoinRoomObject.class, (client, data, ackSender) -> {
+            System.out.println("Socket ID ["+client.getSessionId().toString()+"] - " + data.toString());
+            // add user to one game sessione
+            client.leaveRoom(data.getRoomName());
 
+            // send new user connection to all connected users
+//            int connectedClients = server.getRoomOperations(data.getRoomName()).getClients().size();
+//            server.getRoomOperations(data.getRoomName()).sendEvent("connections_update",
+//                    new NewConnectionObject(connectedClients));
+        });
         server.start();
 
         System.out.println("SocketIO server started on port " + port);
