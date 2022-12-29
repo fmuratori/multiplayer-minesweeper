@@ -7,12 +7,12 @@ import io.vertx.ext.web.client.WebClientOptions;
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.socket.SocketServer;
 
-public class RestAPIClient {
+public class RestClient {
     private static final String serverHost = "0.0.0.0";
     private static final int serverPort = 8003;
 
     private final WebClient client;
-    public RestAPIClient(Vertx vertx) {
+    public RestClient(Vertx vertx) {
         WebClientOptions options = new WebClientOptions()
 //                .setUserAgent("My-App/1.2.3")
                 ;

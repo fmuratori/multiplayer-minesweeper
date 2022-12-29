@@ -7,12 +7,9 @@ COPY . .
 
 RUN gradle build
 CMD ["gradle", "run"]
-EXPOSE 8001
 
-
-# FROM eclipse-temurin:11
-# WORKDIR /app
-# COPY . .
-# RUN ./gradlew build
-# CMD ["gradlew", "run"]
-# EXPOSE 8001
+# PORTS:
+# - 8003: Http server
+# - 8004: Socket.IO server
+EXPOSE 8003
+# EXPOSE 8004

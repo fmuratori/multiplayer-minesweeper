@@ -6,43 +6,39 @@ package multiplayer.minesweeper.rest.server;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CorsHandler;
 import multiplayer.minesweeper.sessions.GameMode;
+import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.sessions.SessionsManager;
+import multiplayer.minesweeper.socket.SocketServer;
 
-public class HttpServer extends AbstractVerticle {
-    private final static HttpServer instance = new HttpServer();
+import java.util.UUID;
 
-    private HttpServer() {}
+public class RestServer extends AbstractVerticle {
+    private final static RestServer instance = new RestServer();
+
+    private RestServer() {}
 
     private void createNewSession(RoutingContext rc) {
-        System.out.println("Received new session request.");
+        rc.request().bodyHandler(bodyHandler -> {
+            final JsonObject body = bodyHandler.toJsonObject();
+            System.out.println("Received new-session request. Body: " + body);
 
-        String sessionName = rc.get("name");
-        GameMode mode = GameMode.getEnum(rc.get("gameMode", GameMode.SMALL_GRID.getName()));
+            String sessionName = body.getString("sessionName");
+            GameMode mode = GameMode.getEnum(body.getString("selectedGameMode"));
+            String roomId = UUID.randomUUID().toString();
+            Session newSession = SessionsManager.getInstance().addSession(roomId, sessionName, mode);
+            SocketServer.getInstance().emitSessionUpdate(newSession);
 
-        String roomId = "test_room";
-
-        SessionsManager.getInstance().addSession(roomId, sessionName, mode);
-
-        rc.response()
-                .putHeader("content-type",
-                        "application/json; charset=utf-8")
-                .end(Json.encodePrettily(roomId));
+            rc.response()
+                    .putHeader("content-type",
+                            "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(roomId));
+        });
     }
-
-//    private void connectToSession(RoutingContext rc) {
-//        System.out.println("Received connect request.");
-//
-//        String roomId = rc.get("room_id");
-//
-//        rc.response()
-//                .putHeader("content-type",
-//                        "application/json; charset=utf-8")
-//                .end(Json.encodePrettily(""));
-//    }
 
     @Override
     public void start() {
@@ -59,8 +55,7 @@ public class HttpServer extends AbstractVerticle {
             .allowedHeader("Access-Control-Allow-Credentials")
             .allowedHeader("Content-Type"));
 
-//        router.post("/connect").handler(this::connectToSession);
-        router.post("/create_session").handler(this::createNewSession);
+        router.post("/new-session").handler(this::createNewSession);
 
         vertx.createHttpServer()
                 .requestHandler(router)
@@ -77,7 +72,7 @@ public class HttpServer extends AbstractVerticle {
         vertx.close();
     }
 
-    public static HttpServer getInstance() {
+    public static RestServer getInstance() {
         return instance;
     }
 }

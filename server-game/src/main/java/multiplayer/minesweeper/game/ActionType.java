@@ -2,8 +2,7 @@ package multiplayer.minesweeper.game;
 
 public enum ActionType {
     FLAG("FLAG"),
-    VISIT("VISIT"),
-    UNFLAG("UNFLAG");
+    VISIT("VISIT");
 
     public final String label;
 

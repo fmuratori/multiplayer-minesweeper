@@ -12,6 +12,8 @@ public class Session {
     private final int numPlayers;
     private int numConnectedUsers;
 
+    private boolean isFullFlag = false;
+
     public Session(String roomId, String sessionName, GameMode gameMode) {
         this.roomId = roomId;
         this.sessionName = sessionName;
@@ -19,16 +21,22 @@ public class Session {
         this.numConnectedUsers = 0;
         this.gridWidth = gameMode.getGridWidth();
         this.gridHeight = gameMode.getGridHeight();
-        this.numPlayers = gameMode.getGridWidth();
+        this.numPlayers = gameMode.getNumPlayers();
         this.creationDate = new Date();
     }
 
     public synchronized void addConnectedUsers() {
+
         numConnectedUsers++;
+        if (numConnectedUsers == numPlayers)
+            isFullFlag = true;
     }
 
     public synchronized void removeConnectedUsers() {
         numConnectedUsers--;
+
+        if (numConnectedUsers < numPlayers)
+            isFullFlag = false;
     }
 
     public String getRoomId() {
@@ -43,18 +51,6 @@ public class Session {
         return sessionName;
     }
 
-    public GameMode getGameMode() {
-        return gameMode;
-    }
-
-    public int getNumConnectedUsers() { return numConnectedUsers; }
-
-    public boolean isFull() {
-        return numConnectedUsers >= gameMode.getNumPlayers();
-    }
-
-    public boolean isEmpty() { return numConnectedUsers == 0; }
-
     public int getGridWidth() {
         return gridWidth;
     }
@@ -66,4 +62,15 @@ public class Session {
     public int getNumPlayers() {
         return numPlayers;
     }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public synchronized int getNumConnectedUsers() { return numConnectedUsers; }
+
+    public synchronized boolean isFull() { return isFullFlag; }
+
+    public synchronized boolean isEmpty() { return numConnectedUsers == 0; }
+
 }

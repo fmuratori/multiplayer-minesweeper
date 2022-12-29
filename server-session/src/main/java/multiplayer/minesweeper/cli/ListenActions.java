@@ -1,38 +1,26 @@
 package multiplayer.minesweeper.cli;
 
-import multiplayer.minesweeper.server.HttpServer;
+import multiplayer.minesweeper.rest.server.RestServer;
 import multiplayer.minesweeper.socket.SocketServer;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.Scanner;
 
 public class ListenActions implements Runnable {
     private boolean running = true;
     @Override
     public void run() {
         System.out.println("Starting terminal listener");
+        Scanner scanner = new Scanner(System.in);
         while (running) {
-            // Enter data using BufferReader
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(System.in));
+            String name = scanner.nextLine();
+            System.out.println(name);
 
-            // Reading data using readLine
-            String name = null;
-            try {
-                name = reader.readLine();
-            } catch (IOException e) {
-                System.out.println("Error occured while reading line");
-                continue;
-            }
-
-            // Handle line
             if (name.equals("EXIT")) {
                 System.out.println("Closing the service");
                 running = false;
-                HttpServer.getInstance().close();
+                RestServer.getInstance().close();
                 SocketServer.getInstance().close();
             }
         }
+        scanner.close();
     }
 }

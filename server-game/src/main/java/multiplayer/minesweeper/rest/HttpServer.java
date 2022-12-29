@@ -39,6 +39,7 @@ public class HttpServer extends AbstractVerticle {
                     .end(gameId);
         });
     }
+
     @Override
     public void start() {
         Router router = Router.router(vertx);

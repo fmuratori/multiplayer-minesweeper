@@ -64,7 +64,7 @@ public class GameTest {
             for (int j  = 0; j < GRID_WIDTH; j++)
                 if (gameManager.getGridState()[i][j] == TileState.VISITED) visitedTiles++;
 
-        assertEquals(visitedTiles, 12); // 4*4 tiles - (3 mines + 1 isolated tile)
+        assertEquals(visitedTiles, 10); // 4*4 tiles - (3 mines + 1 isolated tile)
     }
 
     @Test
@@ -75,7 +75,7 @@ public class GameTest {
 
         ActionResult result2 = gameManager.action(0, 0, ActionType.FLAG);
         assertEquals(result2, ActionResult.OK);
-        assertEquals(gameManager.getGridState()[0][0], TileState.FLAGGED);
+        assertEquals(gameManager.getGridState()[0][0], TileState.NOT_VISITED);
 
         ActionResult result3 = gameManager.action(0, 1, ActionType.FLAG);
         assertEquals(result3, ActionResult.OK);
@@ -84,19 +84,36 @@ public class GameTest {
 
     @Test
     public void testActionWithExplosion() {
-        ActionResult result = gameManager.action(0, 0, ActionType.VISIT);
-        assertEquals(result, ActionResult.EXPLOSION);
-        assertEquals(gameManager.getGridState()[0][0], TileState.EXPLODED);
+        ActionResult result1 = gameManager.action(1, 0, ActionType.VISIT);
+        assertEquals(result1, ActionResult.OK);
 
         ActionResult result2 = gameManager.action(1, 1, ActionType.VISIT);
-        assertEquals(result2, ActionResult.IGNORED);
+        assertEquals(result2, ActionResult.EXPLOSION);
+
+        assertEquals(gameManager.getGridState()[1][1], TileState.EXPLODED);
+
+        ActionResult result3 = gameManager.action(1, 1, ActionType.VISIT);
+        assertEquals(result3, ActionResult.IGNORED);
+    }
+
+    @Test
+    public void testFirstActionWithExplosion() {
+        ActionResult result1 = gameManager.action(0, 0, ActionType.VISIT);
+        assertEquals(result1, ActionResult.OK);
+
+        assertEquals(gameManager.getGridState()[0][0], TileState.VISITED);
     }
 
     @Test
     public void testGameOver() {
-        gameManager.action(3, 3, ActionType.VISIT);
-        ActionResult result = gameManager.action(1, 0, ActionType.VISIT);
-        assertEquals(result, ActionResult.GAME_OVER);
+        ActionResult result1 = gameManager.action(3, 3, ActionType.VISIT);
+        ActionResult result2 = gameManager.action(3, 0, ActionType.VISIT);
+        ActionResult result3 = gameManager.action(0, 1, ActionType.VISIT);
+        ActionResult result4 = gameManager.action(1, 0, ActionType.VISIT);
+        assertEquals(result1, ActionResult.OK);
+        assertEquals(result2, ActionResult.OK);
+        assertEquals(result3, ActionResult.OK);
+        assertEquals(result4, ActionResult.GAME_OVER);
     }
 
 

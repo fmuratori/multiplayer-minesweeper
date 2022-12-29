@@ -4,11 +4,11 @@ import multiplayer.minesweeper.sessions.Session;
 
 public class SessionUpdateObject {
     private Session session;
-    private String updateType;
+    private SessionUpdateType updateType;
 
     public SessionUpdateObject() {}
 
-    public SessionUpdateObject(Session session, String updateType) {
+    public SessionUpdateObject(Session session, SessionUpdateType updateType) {
         this.session = session;
         this.updateType = updateType;
     }
@@ -18,6 +18,6 @@ public class SessionUpdateObject {
     }
 
     public String getUpdateType() {
-        return updateType;
+        return updateType.getValue();
     }
 }

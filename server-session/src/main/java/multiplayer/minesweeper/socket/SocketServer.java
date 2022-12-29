@@ -1,11 +1,11 @@
 package multiplayer.minesweeper.socket;
 
 import com.corundumstudio.socketio.*;
-import multiplayer.minesweeper.client.RestAPIClient;
+import multiplayer.minesweeper.rest.client.RestClient;
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.sessions.SessionsManager;
-import multiplayer.minesweeper.socket.in.LeaveRoomObject;
 import multiplayer.minesweeper.socket.in.JoinRoomObject;
+import multiplayer.minesweeper.socket.in.LeaveRoomObject;
 import multiplayer.minesweeper.socket.out.*;
 
 import java.util.Optional;
@@ -16,18 +16,18 @@ public class SocketServer {
     private SocketIOServer server;
     private SocketIONamespace browseNamespace;
     private SocketIONamespace sessionNamespace;
-    private RestAPIClient gameClient;
+    private RestClient gameClient;
 
     private SocketServer() {}
 
 
-    public void setGameClient(RestAPIClient gameClient) {
+    public void setGameClient(RestClient gameClient) {
         this.gameClient = gameClient;
     }
 
     public void initialize(int port) {
         Configuration config = new Configuration();
-        config.setHostname("localhost");
+        config.setHostname("0.0.0.0");
         config.setPort(port);
 
         server = new SocketIOServer(config);
@@ -68,11 +68,11 @@ public class SocketServer {
 
                     browseNamespace.getBroadcastOperations()
                             .sendEvent("session_update",
-                                    new SessionUpdateObject(session.get(), "GAME_STARTING"));
+                                    new SessionUpdateObject(session.get(), SessionUpdateType.GAME_STARTING));
                 } else {
                     browseNamespace.getBroadcastOperations()
                             .sendEvent("session_update",
-                                    new SessionUpdateObject(session.get(), "ADDED_USER"));
+                                    new SessionUpdateObject(session.get(), SessionUpdateType.ADDED_USER));
                 }
             }
         });
@@ -105,7 +105,7 @@ public class SocketServer {
 //                } else {
                     browseNamespace.getBroadcastOperations()
                             .sendEvent("session_update",
-                                    new SessionUpdateObject(session.get(), "REMOVED_USER"));
+                                    new SessionUpdateObject(session.get(), SessionUpdateType.REMOVED_USER));
 //                }
             }
         });
@@ -114,7 +114,7 @@ public class SocketServer {
         browseNamespace.addConnectListener((client) -> {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - Connected to namespace /browse");
             client.sendEvent("sessions_update",
-                    new SessionsUpdateObject(SessionsManager.getInstance().getAllSessions()));
+                    new SessionsUpdateObject(SessionsManager.getInstance().getOpenSessions()));
         });
         browseNamespace.addDisconnectListener(client -> {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - Disconnected from namespace /browse");
@@ -132,11 +132,16 @@ public class SocketServer {
 
     public void gameStartingResponse(String sessionRoomName, String gameRoomName) {
         Optional<Session> session = SessionsManager.getInstance().getSession(sessionRoomName);
-        if (session.isPresent())
-            sessionNamespace
+        session.ifPresent(value -> sessionNamespace
                 .getRoomOperations(sessionRoomName)
                 .sendEvent("game_starting",
-                        new GameStartingObject(gameRoomName, session.get()));
+                        new GameStartingObject(gameRoomName, value)));
+    }
+
+    public void emitSessionUpdate(Session session) {
+        browseNamespace.getBroadcastOperations()
+                .sendEvent("session_update",
+                        new SessionUpdateObject(session, SessionUpdateType.NEW_SESSION));
     }
 
     public static SocketServer getInstance() {

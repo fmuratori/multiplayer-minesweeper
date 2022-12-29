@@ -4,7 +4,8 @@ public enum SessionUpdateType {
     ADDED_USER("ADDED_USER"),
     REMOVED_USER("REMOVED_USER"),
     CLOSED("REMOVED_USER"),
-    GAME_STARTING("REMOVED_USER");
+    GAME_STARTING("REMOVED_USER"),
+    NEW_SESSION("NEW_SESSION");
 
     private final String value;
 

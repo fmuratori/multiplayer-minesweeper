@@ -22,7 +22,7 @@ public class SocketServer {
 
     public void initialize(int port) {
         Configuration config = new Configuration();
-        config.setHostname("localhost");
+        config.setHostname("0.0.0.0");
         config.setPort(port);
 
         server = new SocketIOServer(config);
@@ -73,9 +73,9 @@ public class SocketServer {
             client.sendEvent("game_update", new GameUpdateObject(map));
 
             // send new user connection to all connected users
-//            int connectedClients = server.getRoomOperations(data.getRoomName()).getClients().size();
-//            server.getRoomOperations(data.getRoomName()).sendEvent("connections_update",
-//                    new NewConnectionObject(connectedClients));
+            int connectedClients = server.getRoomOperations(data.getRoomName()).getClients().size();
+            server.getRoomOperations(data.getRoomName()).sendEvent("connections_update",
+                    new NewConnectionObject(connectedClients));
         });
         server.addEventListener("leave_room", JoinRoomObject.class, (client, data, ackSender) -> {
             System.out.println("Socket ID ["+client.getSessionId().toString()+"] - " + data.toString());

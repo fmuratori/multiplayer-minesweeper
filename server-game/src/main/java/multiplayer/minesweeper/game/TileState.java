@@ -1,7 +1,13 @@
 package multiplayer.minesweeper.game;
 
 public enum TileState {
-    VISITED("VISITED"), NOT_VISITED("NOT_VISITED"), FLAGGED("FLAGGED"), EXPLODED("EXPLODED");
+    VISITED("V"), NOT_VISITED("N"), FLAGGED("F"), EXPLODED("E");
+    /**
+     * V: VISITED
+     * N: NOT_VISITED
+     * F: FLAGGED
+     * E: EXPLOSION
+     */
 
     public final String value;
 

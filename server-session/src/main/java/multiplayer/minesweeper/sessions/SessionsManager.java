@@ -15,9 +15,10 @@ public class SessionsManager {
             return Optional.of(sessions.get(roomId));
     }
 
-    public void addSession(String roomId, String sessionName, GameMode mode) {
+    public Session addSession(String roomId, String sessionName, GameMode mode) {
         Session newSession = new Session(roomId, sessionName, mode);
         sessions.put(roomId, newSession);
+        return newSession;
     }
 
     public void removeSession(String roomId) {
@@ -36,7 +37,7 @@ public class SessionsManager {
                 .collect(Collectors.toList());
     }
 
-    public List<Session> getAllSessions() {
-        return new ArrayList<>(sessions.values());
+    public List<Session> getOpenSessions() {
+        return sessions.values().stream().filter(s -> !s.isFull()).collect(Collectors.toList());
     }
 }
