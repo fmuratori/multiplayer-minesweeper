@@ -1,4 +1,4 @@
-package multiplayer.minesweeper.client;
+package multiplayer.minesweeper.rest.client;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -7,10 +7,8 @@ import io.vertx.ext.web.client.WebClientOptions;
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.socket.SocketServer;
 
-import javax.security.auth.callback.Callback;
-
 public class RestAPIClient {
-    private static final String serverHost = "127.0.0.1";
+    private static final String serverHost = "0.0.0.0";
     private static final int serverPort = 8003;
 
     private final WebClient client;
@@ -33,11 +31,11 @@ public class RestAPIClient {
                             .put("gridHeight", session.getGameMode().getGridHeight())
                             .put("numPlayers", session.getGameMode().getNumPlayers())
                             .put("numConnectedPlayers", session.getNumConnectedUsers())
-//                            .put("minesPercentage", session.getGameMode().minesPercentage)
+                            .put("minesPercentage", session.getGameMode().getMinesPercentage())
                 )
             .onSuccess(response -> {
                 if (response.statusCode() == 200) {
-                    System.out.println("Received response with status code" + response.bodyAsString());
+                    System.out.println("Received response with status code " + response.bodyAsString());
                     // run callback without stopping the http server
                     new Thread(() -> SocketServer
                             .getInstance()

@@ -2,7 +2,7 @@ import {Link, Outlet} from 'react-router-dom';
 import './App.css';
 import { useEffect } from 'react';
 
-import {SocketContext, gameSocket} from './scripts/GameSocket'
+import {GameSocketContext, gameSocket} from './scripts/GameSocket'
 import {SessionSocketContext, sessionSocket} from './scripts/SessionSocket'
 
 function App() {
@@ -33,8 +33,8 @@ function App() {
 
   return (
     <div>
-      <SessionSocketContext.Provider value={sessionSocket}>
-        <SocketContext.Provider value={gameSocket}>
+      {/* <SessionSocketContext.Provider value={sessionSocket}>
+        <GameSocketContext.Provider value={gameSocket}> */}
           {/* <div>
             <Link to={`/create-session`}>Create</Link>
             <Link to={`/session`}>Your session</Link>
@@ -42,8 +42,8 @@ function App() {
             <Link to={`/sessions`}>Home</Link>
           </div> */}
           <Outlet />
-        </SocketContext.Provider>
-      </SessionSocketContext.Provider>
+        {/* </GameSocketContext.Provider>
+      </SessionSocketContext.Provider> */}
     </div>
   );
 }

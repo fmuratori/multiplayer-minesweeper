@@ -14,7 +14,6 @@ public class Main {
         SessionsManager.getInstance().addSession("test_room_1", "Test session", GameMode.SMALL_GRID);
         SessionsManager.getInstance().addSession("test_room_2", "Test session 2", GameMode.MEDIUM_GRID);
 
-
         // start http server
         Vertx vertx = Vertx.vertx();
         vertx.deployVerticle(HttpServer.getInstance());

@@ -9,28 +9,29 @@ function WaitingStart() {
   const {state} = useLocation();
   const navigate = useNavigate();
 
-  sessionSocket.on('connect', () => {
-    console.log('SocketIo [SESSION] - Connect to server-session');
-    sessionSocket.emit('join_room', state.roomId)
-  });
-  sessionSocket.on('disconnect', () => {
-    console.log('SocketIo [SESSION] - Disconnect from server-session');
-  });
-  sessionSocket.on('game_starting', (data:any) => {
-    console.log('SocketIo [SESSION] - Game starting update', data);
-    navigate('/game', { state: data });
-  });
-  sessionSocket.on('players_count_update', (data: any) => {
-    console.log('SocketIo - Players count update', data);
-    setPlayersCount(data)
-  });
-  sessionSocket.on('session_error', (data: any) => {
-    console.log('SocketIo - Session error', data);
-    navigate('/sessions');
-  });
-
+  
   useEffect(() => {
-    sessionSocket.open()
+    sessionSocket.on('connect', () => {
+      console.log('SocketIo [SESSION] - Connect to server-session');
+      sessionSocket.emit('join_room', state.roomId)
+    });
+    sessionSocket.on('disconnect', () => {
+      console.log('SocketIo [SESSION] - Disconnect from server-session');
+    });
+    sessionSocket.on('game_starting', (data:any) => {
+      console.log('SocketIo [SESSION] - Game starting update', data);
+      navigate('/game', { state: data });
+    });
+    sessionSocket.on('players_count_update', (data: any) => {
+      console.log('SocketIo [SESSION] - Players count update', data);
+      setPlayersCount(data)
+    });
+    sessionSocket.on('session_error', (data: any) => {
+      console.log('SocketIo - Session error', data);
+      setTimeout(() => navigate('/sessions'), 5000);
+    });
+
+    sessionSocket.open();
 
     return () => {
       sessionSocket.off('connect');
@@ -38,6 +39,7 @@ function WaitingStart() {
       sessionSocket.off('game_starting');
       sessionSocket.off('players_count_update');
       sessionSocket.off('session_error');
+      sessionSocket.close();
     };
   }, [])
 
@@ -50,13 +52,13 @@ function WaitingStart() {
   }
 
   return (
-    <div className='container'>
+    <div className='container mt-6'>
       <div className='row justify-content-md-center'>
-        <div className='col-6'>
+        <div className='col-6 '>
           <div>
             <div className='row gx-2'>
               <div className='col'>
-                <div className='box p-5'>
+                <div className='border rounded p-5'>
                   <p className='text-center mb-0 pb-0 '>
                     <span className='spinner-border my-big-spinner ' role='status'>
                       <span className='visually-hidden text-center'>Loading...</span>
