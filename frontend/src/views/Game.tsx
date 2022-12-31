@@ -15,9 +15,6 @@ function Game() {
   const navigate = useNavigate(); 
   
   useEffect(() => {
-    // gameSocket.on('players_count_update', (count: number) => {
-    //   console.log("players_count_update", count);
-    // });
     gameSocket.on('connect', () => {
       console.log('SocketIo [GAME] - Connect to server-game');
       gameSocket.emit("join_room", state.roomName);
@@ -25,8 +22,12 @@ function Game() {
     });
     gameSocket.on('disconnect', () => {
       console.log('SocketIo [GAME] - Disconnect from server-game');
-
+      
       // show disconnection message and redirect to home button
+      setTimeout(() => navigate('/sessions'), 5000);
+    });
+    gameSocket.on('players_count_update', (count: number) => {
+      console.log("players_count_update", count);
     });
     gameSocket.on('game_won', (data: { map: string }) => {
       console.log("game_won", data["map"]);
@@ -188,7 +189,7 @@ function Game() {
     <div>
       <div className="mt-4">
         <div className="row justify-content-center">
-          <div className="col-8">
+          <div className="col-lg-12">
             <div className="box">
               <div className="row align-items-center justify-content-center">
                 <div className="col-auto p-4">

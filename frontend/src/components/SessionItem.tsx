@@ -19,7 +19,7 @@ function SessionItem(props) {
         <div className='col-auto'>
           <p className='mb-0'>
             <i className="bi bi-person-fill"></i>
-            {props.data.numConnectedUsers}
+            {props.data.numConnectedUsers} / {props.data.numPlayers}
           </p>
         </div>
         <div className='col-auto'>

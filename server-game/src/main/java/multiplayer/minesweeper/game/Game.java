@@ -1,8 +1,6 @@
 package multiplayer.minesweeper.game;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -19,6 +17,8 @@ public class Game {
 
     private boolean gameOverFlag = false;
     private boolean firstActionFlag = true;
+
+    private Set<UUID> connectedPlayers = new HashSet<>();
 
     public Game(int width, int height, float minesPercentage) {
         this.width = width;
@@ -228,5 +228,17 @@ public class Game {
 
     public TileState[][] getGridState() {
         return gridState;
+    }
+
+    public void addPlayer(UUID newPlayerId) {
+        connectedPlayers.add(newPlayerId);
+    }
+
+    public boolean containsPlayer(UUID playerId) {
+        return connectedPlayers.contains(playerId);
+    }
+
+    public void removePlayer(UUID playerId) {
+        connectedPlayers.remove(playerId);
     }
 }

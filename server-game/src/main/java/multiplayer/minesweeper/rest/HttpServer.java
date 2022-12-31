@@ -29,7 +29,7 @@ public class HttpServer extends AbstractVerticle {
             // max number of allowed players inside a single session
             int numPlayers = body.getInteger("numPlayers");
 
-            String gameId = GamesManager.getInstance().newGame(gridWidth, gridHeight, minesPercentage);
+            String gameId = GamesManager.get().newGame(gridWidth, gridHeight, minesPercentage);
 
             System.out.println("Created new-game, created Socketio room: " + gameId);
 

@@ -1,17 +1,17 @@
 package multiplayer.minesweeper.game;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GamesManager {
     private static final GamesManager instance = new GamesManager();
-    private final Map<String, Game> activeGames = new HashMap<>();
+    private final Map<String, Game> activeGames = new ConcurrentHashMap<>();
 
     private GamesManager() {}
 
-    public static GamesManager getInstance() {
+    public static GamesManager get() {
         return instance;
     }
 
@@ -21,6 +21,10 @@ public class GamesManager {
         newInstance.initialize();
         activeGames.put(gameId, newInstance);
         return gameId;
+    }
+
+    public void deleteGame(String roomId) {
+        activeGames.remove(roomId);
     }
 
     public String testGame() {
@@ -35,5 +39,14 @@ public class GamesManager {
         if (!activeGames.containsKey(roomId))
             throw new IllegalArgumentException();
         return activeGames.get(roomId);
+    }
+
+    public Optional<String> findGameByUser(UUID playerId) {
+        for (Map.Entry<String, Game> elem : activeGames.entrySet()) {
+            if (elem.getValue().containsPlayer(playerId)) {
+                return Optional.of(elem.getKey());
+            }
+        }
+        return Optional.empty();
     }
 }

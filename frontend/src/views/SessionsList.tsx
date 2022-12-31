@@ -54,7 +54,7 @@ function SessionsList() {
 
       setSessions((sessions) => {
         const idx = sessions.findIndex(s => s.roomId === data.session.roomId);
-        if (data.updateType === "NEW_SESSION") {
+        if (data.updateType === "NEW_SESSION" || (idx === -1 && data.updateType === "REMOVED_USER")) {
           sessions.push(data.session)
         } else if (idx !== -1) {
           if (data.updateType === "REMOVED_USER" || data.updateType === "ADDED_USER") {
@@ -62,7 +62,7 @@ function SessionsList() {
           } else if (data.updateType === "CLOSED" || data.updateType === "GAME_STARTING") { 
             sessions = sessions.filter((s) => s.roomId !== data.session.roomId);
           }
-        }
+        } 
         return structuredClone(sessions)
       })
     });
@@ -104,6 +104,11 @@ function SessionsList() {
 
   function handleNewSessionSubmit(e) {
     e.preventDefault();
+    if (formState.sessionName === null || formState.selectedGameMode === null) {
+      console.log("ERROR")
+      return
+    }
+
     postNewSession(formState).then((response) => {
       if (response.status === 200) {
         resetNewSessionForm();
@@ -114,9 +119,9 @@ function SessionsList() {
   }
 
   return (
-    <div className="container p-5">
-      <div className='row'>
-        <div className='col'>
+    <div className="container-fluid p-5">
+      <div className='row justify-content-center'>
+        <div className='col-lg-6 col-xl-4'>
           <div className='border p-3'>
             <label className='fs-3 mb-3'>Lista sessioni</label>
             <div>
@@ -132,7 +137,7 @@ function SessionsList() {
             </div>
           </div>
         </div>
-        <div className="col">
+        <div className="col-lg-6 col-xl-4">
             <div className="border p-3">
               <form onSubmit={handleNewSessionSubmit}>
                 <label className='fs-3 mb-3'>Crea una sessione</label>
