@@ -4,7 +4,8 @@ public class JoinRoomObject {
 
     private String roomName;
 
-    public JoinRoomObject() {}
+    public JoinRoomObject() {
+    }
 
     public JoinRoomObject(String roomName) {
         super();

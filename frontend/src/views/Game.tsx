@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import {gameSocket} from '../scripts/GameSocket';
 import './Game.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import moment from 'moment'
+
+import Modal from 'react-bootstrap/Modal';
 
 function Game() {
-  var [gameOverFlag, setGameOverFlag] = useState(true);
-  var [gameWonFlag, setGameWonFlag] = useState(false);
-  var [map, setMap] = useState(null);
-  var [gameStartTime, setGameStartTime] = useState(null);
+  const [gameOverFlag, setGameOverFlag] = useState(false);
+  const [gameWonFlag, setGameWonFlag] = useState(false);
+  const [map, setMap] = useState(null);
 
   const {state} = useLocation();
   const navigate = useNavigate(); 
@@ -18,7 +18,6 @@ function Game() {
     gameSocket.on('connect', () => {
       console.log('SocketIo [GAME] - Connect to server-game');
       gameSocket.emit("join_room", state.roomName);
-      setGameStartTime(moment(state.session.creationDate))
     });
     gameSocket.on('disconnect', () => {
       console.log('SocketIo [GAME] - Disconnect from server-game');
@@ -32,20 +31,18 @@ function Game() {
     gameSocket.on('game_won', (data: { map: string }) => {
       console.log("game_won", data["map"]);
       updateMap(data["map"]);
-      gameOverFlag = true;
-      gameWonFlag = true;
+      setGameOverFlag(true);
+      setGameWonFlag(true);
 
       // show won game message and redirect to home button
-      gameSocket.close();
       setTimeout(() => navigate('/sessions'), 5000);
     });
     gameSocket.on('game_lost', (data: { map: string }) => {
       console.log("game_lost", data["map"]);
       updateMap(data["map"]);
-      gameOverFlag = true;
+      setGameOverFlag(true);
 
       // show lost game message and redirect to home button
-      gameSocket.close();
       setTimeout(() => navigate('/sessions'), 5000);
     });
     gameSocket.on('game_update', (data: { map: string }) => {
@@ -64,6 +61,7 @@ function Game() {
       gameSocket.off('game_won');
       gameSocket.off('game_lost');
       gameSocket.off('game_update');
+      gameSocket.close();
     };
   }, []);
 
@@ -105,6 +103,7 @@ function Game() {
   function disconnect(e:React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     gameSocket.close();
+    navigate('/sessions');
   }
 
   function drawTable() {
@@ -155,80 +154,89 @@ function Game() {
   function drawCellContent(content:string) {
     switch (content) {
       case "C":
-        return <span className='fs-3'></span>
+        return <span className=''></span>
       case "1":
-        return <span className='fs-3'>1</span>
+        return <span className=''>1</span>
       case "2":
-        return <span className='fs-3'>2</span>
+        return <span className=''>2</span>
       case "3":
-        return <span className='fs-3'>3</span>
+        return <span className=''>3</span>
       case "4":
-        return <span className='fs-3'>4</span>  
+        return <span className=''>4</span>  
       case "5":
-        return <span className='fs-3'>5</span>
+        return <span className=''>5</span>
       case "6":
-        return <span className='fs-3'>6</span>
+        return <span className=''>6</span>
       case "7":
-        return <span className='fs-3'>7</span>
+        return <span className=''>7</span>
       case "8":
-        return <span className='fs-3'>8</span>
+        return <span className=''>8</span>
       case "F":
-        return <i className='bi bi-flag big-icon fs-4'></i>
+        return <i className='bi bi-flag'></i>
       case "E":
-        return <i className="bi bi-virus2  big-icon"></i>
+        return <i className="bi bi-virus2"></i>
       case "M":
-        return <i className="bi bi-virus2  big-icon"></i>
+        return <i className="bi bi-virus2"></i>
       case "N":
         return <span></span>
       default:
-        return <i className='bi bi-question big-icon'></i>
+        return <i className='bi bi-question'></i>
     }
   }
 
   return (
     <div>
-      <div className="mt-4">
+      <div className=" container-fluid p-3">
         <div className="row justify-content-center">
-          <div className="col-lg-12">
-            <div className="box">
-              <div className="row align-items-center justify-content-center">
-                <div className="col-auto p-4">
-                  <table>
-                    <tbody>
-                      {drawTable()}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="col-3 text-center">
-                  <div className="row row-cols-12">
-                    <div className="bi-alarm big-icon">
-                      <i></i>
-                      <h3>
-                        ORA
-                      </h3>
-                    </div>
-                    <div>
-                      <i className="bi-flag big-icon"></i>
-                      <h3>
-                        FLAG  
-                      </h3>
-                    </div>
-                    <div>
-                      <i className="bi-people big-icon"></i>
-                      <h3>
-                        GIOCATORI
-                      </h3>
-                    </div>
-                    <div>
-                      <button type="button" className="btn btn-danger btn-lg" onClick={disconnect}>Esci</button>
-                    </div>
-                  </div>
+          <div className={`border rounded ` + (state.session.gridWidth == 30 ? `col-12` : state.session.gridWidth == 16 ? `col-xl-auto col-lg-12` : `col-xl-auto col-lg-10 col-md-12`)}>
+            <div className="row align-items-center justify-content-center text-center m-4">
+              <div className='col-auto'>
+                <table>
+                  <tbody>
+                    {drawTable()}
+                  </tbody>
+                </table>
+              </div>
+              <div className="col-auto mt-4 text-center">
+                <div>
+                  <button type="button" className="btn btn-danger btn-lg" onClick={disconnect}>Esci</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <Modal show={gameOverFlag}>
+        <Modal.Header>
+          <Modal.Title> Game Over </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className='text-center'>
+          {
+            gameWonFlag ? 
+            <p className='fs-5 mb-5 mt-3 text-success'>
+              <i className="bi-stars fs-3"></i>
+              <br />
+              Congratulation! 
+              <br />
+              You and your team won this game
+            </p>
+            :
+            <p className='fs-5 mb-5 mt-3 text-danger'>
+              <i className="bi-emoji-frown fs-3"></i>
+              <br />
+              Git gud! 
+              <br />
+              You and your team lost this game
+            </p>
+          }
+          <p className='fs-6 mb-2 pb-0'>
+            <i>
+              You will be redirected to the main page shortly.
+            </i>
+          </p>
+
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

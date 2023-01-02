@@ -4,7 +4,8 @@ public class LeaveRoomObject {
 
     private String roomName;
 
-    public LeaveRoomObject() {}
+    public LeaveRoomObject() {
+    }
 
     public LeaveRoomObject(String roomName) {
         super();

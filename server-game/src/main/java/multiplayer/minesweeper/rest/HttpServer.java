@@ -3,23 +3,30 @@
  */
 package multiplayer.minesweeper.rest;
 
+import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.CorsHandler;
 import multiplayer.minesweeper.game.GamesManager;
+import multiplayer.minesweeper.gamemode.GameModeFactory;
 
 public class HttpServer extends AbstractVerticle {
     private final static HttpServer instance = new HttpServer();
+    private final Gson gson;
 
-    private HttpServer() {}
+    private HttpServer() {
+        gson = new Gson();
+    }
 
     private void createNewGame(RoutingContext rc) {
 
         rc.request().bodyHandler(bodyHandler -> {
             final JsonObject body = bodyHandler.toJsonObject();
 
-            System.out.println("Received new-game request. Body: " + body);
+            System.out.println("Received POST new-game request. Body: " + body);
 
             int gridWidth = body.getInteger("gridWidth");
             int gridHeight = body.getInteger("gridHeight");
@@ -40,11 +47,28 @@ public class HttpServer extends AbstractVerticle {
         });
     }
 
+
+    private void getGameModes(RoutingContext rc) {
+        rc.request().bodyHandler(bodyHandler -> {
+            System.out.println("Received GET game-modes request. ");
+            rc.response()
+                    .putHeader("content-type",
+                            "application/json; charset=utf-8")
+                    .end(gson.toJson(GameModeFactory.getAllGameModes()));
+        });
+    }
+
     @Override
     public void start() {
         Router router = Router.router(vertx);
 
+        router.route().handler(
+                CorsHandler.create(".*.")
+                        .allowedMethod(HttpMethod.GET)
+                        .allowedMethod(HttpMethod.POST));
+
         router.post("/new-game").handler(this::createNewGame);
+        router.get("/game-modes").handler(this::getGameModes);
 
         vertx.createHttpServer()
                 .requestHandler(router)

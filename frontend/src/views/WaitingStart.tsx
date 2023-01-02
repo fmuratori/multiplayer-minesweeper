@@ -9,7 +9,6 @@ function WaitingStart() {
   const {state} = useLocation();
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     sessionSocket.on('connect', () => {
       console.log('SocketIo [SESSION] - Connect to server-session');
@@ -20,7 +19,7 @@ function WaitingStart() {
     });
     sessionSocket.on('game_starting', (data:any) => {
       console.log('SocketIo [SESSION] - Game starting update', data);
-      navigate('/game', { state: data });
+      setTimeout(() => navigate('/game', { state: data }), 1000);
     });
     sessionSocket.on('players_count_update', (data: any) => {
       console.log('SocketIo [SESSION] - Players count update', data);
@@ -52,13 +51,13 @@ function WaitingStart() {
   }
 
   return (
-    <div className='container mt-6'>
+    <div className='container mt-5'>
       <div className='row justify-content-md-center'>
-        <div className='col-6 '>
+        <div className='col-md-8 col-lg-6 '>
           <div>
             <div className='row gx-2'>
               <div className='col'>
-                <div className='border rounded p-5'>
+                <div className='border rounded pt-5 pb-4 px-3'>
                   <p className='text-center mb-0 pb-0 '>
                     <span className='spinner-border my-big-spinner ' role='status'>
                       <span className='visually-hidden text-center'>Loading...</span>
@@ -69,11 +68,15 @@ function WaitingStart() {
                   </h2>
                   <div className='text-center'>
                     <h2>
-                        Giocatori {playersCount.connectedCount} / {playersCount.maxPlayersCount}
+                      <i className="bi-people-fill big-icon me-3"></i>
+                      {playersCount.connectedCount} / {playersCount.maxPlayersCount}
                     </h2>
+                    <p className="mt-4">
+                      Waiting for other players to join this session ...
+                    </p>
                   </div>
                   <div className='d-flex justify-content-center'>
-                    <button className='btn btn-secondary' onClick={exitSession}>Esci</button>
+                    <button className='btn btn-outline-dark mt-4' onClick={exitSession}>Cancel</button>
                   </div>
                 </div>
               </div>

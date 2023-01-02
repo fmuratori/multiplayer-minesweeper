@@ -67,10 +67,16 @@ public class Session {
         return gameMode;
     }
 
-    public synchronized int getNumConnectedUsers() { return numConnectedUsers; }
+    public synchronized int getNumConnectedUsers() {
+        return numConnectedUsers;
+    }
 
-    public synchronized boolean isFull() { return isFullFlag; }
+    public synchronized boolean isFull() {
+        return isFullFlag;
+    }
 
-    public synchronized boolean isEmpty() { return numConnectedUsers == 0; }
+    public synchronized boolean isEmpty() {
+        return numConnectedUsers == 0;
+    }
 
 }

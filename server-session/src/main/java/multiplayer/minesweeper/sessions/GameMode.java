@@ -3,7 +3,7 @@ package multiplayer.minesweeper.sessions;
 public enum GameMode {
     SMALL_GRID("SMALL", 9, 9, 1, 0.081f),
     MEDIUM_GRID("MEDIUM", 16, 16, 2, 0.15625f),
-    BIG_GRID("BIG", 30, 16, 4, 0.20625f);
+    BIG_GRID("BIG", 30, 16, 2, 0.20625f);
 
     private final String name;
     private final int gridWidth;
@@ -35,14 +35,20 @@ public enum GameMode {
         return numPlayers;
     }
 
-    public float getMinesPercentage() { return minesPercentage; }
+    public float getMinesPercentage() {
+        return minesPercentage;
+    }
 
     public static GameMode getEnum(String name) {
         switch (name) {
-            case "SMALL": return GameMode.SMALL_GRID;
-            case "MEDIUM": return GameMode.MEDIUM_GRID;
-            case "BIG": return GameMode.BIG_GRID;
-            default: throw new IllegalArgumentException("Value " + name + "not found");
+            case "SMALL":
+                return GameMode.SMALL_GRID;
+            case "MEDIUM":
+                return GameMode.MEDIUM_GRID;
+            case "BIG":
+                return GameMode.BIG_GRID;
+            default:
+                throw new IllegalArgumentException("Value " + name + "not found");
         }
     }
 }

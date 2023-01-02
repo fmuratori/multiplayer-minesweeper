@@ -18,7 +18,7 @@ public class Game {
     private boolean gameOverFlag = false;
     private boolean firstActionFlag = true;
 
-    private Set<UUID> connectedPlayers = new HashSet<>();
+    private final Set<UUID> connectedPlayers = new HashSet<>();
 
     public Game(int width, int height, float minesPercentage) {
         this.width = width;
@@ -181,7 +181,7 @@ public class Game {
     }
 
     private void visitAndExpand(int x, int y) {
-        if (!(x >= 0 && x < this.width && y >= 0 && y < this.height))
+        if (!(x >= 0 && x < this.height && y >= 0 && y < this.width))
             return;
 
         if (gridState[x][y] == TileState.VISITED)

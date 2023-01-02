@@ -4,29 +4,7 @@ import SessionItem from '../components/SessionItem';
 import {browseSessionsSocket} from '../scripts/SessionSocket'
 import { useNavigate } from 'react-router-dom';
 import GameModeButton from "../components/GameModeButton";
-import {postNewSession} from "../scripts/api";
-
-const GAME_MODES = [
-  {
-    'id': 'SMALL',
-    'name': 'Facile',
-    'numMaxPlayers': 1,
-    'gridWidth': 9,
-    'gridHeight': 9
-  }, {
-    'id': 'MEDIUM',
-    'name': 'Media',
-    'numMaxPlayers': 2,
-    'gridWidth': 16,
-    'gridHeight': 16
-  }, {
-    'id': 'BIG',
-    'name': 'Difficile',
-    'numMaxPlayers': 4,
-    'gridWidth': 30,
-    'gridHeight': 16
-  }
-]
+import {postNewSession, getGameModes} from "../scripts/api";
 
 function SessionsList() {
   const [sessions, setSessions] = useState([]);
@@ -35,7 +13,7 @@ function SessionsList() {
     sessionName:'',
     selectedGameMode:''
   })
-
+  const [gameModes, setGameModes] = useState([]);
   
   useEffect(() => {
     browseSessionsSocket.on('connect', () => {
@@ -69,6 +47,15 @@ function SessionsList() {
 
     browseSessionsSocket.open();
 
+
+    getGameModes().then((response) => {
+      console.log(response);
+      if (response.status === 200) {
+        setGameModes(response.data);
+      } 
+    }).catch((error) => {
+      console.log(error)
+    })
     return () => {
       browseSessionsSocket.off('connect');
       browseSessionsSocket.off('disconnect');
@@ -89,7 +76,7 @@ function SessionsList() {
     })
   }
 
-  function resetNewSessionForm() {
+  function resetForm() {
     setFormState({
       sessionName:'',
       selectedGameMode:null
@@ -102,16 +89,16 @@ function SessionsList() {
       sessionName: event.target.value});
   }
 
-  function handleNewSessionSubmit(e) {
+  function handleFormSubmit(e) {
     e.preventDefault();
-    if (formState.sessionName === null || formState.selectedGameMode === null) {
+    if (formState.sessionName === '' || formState.selectedGameMode === null) {
       console.log("ERROR")
       return
     }
 
     postNewSession(formState).then((response) => {
       if (response.status === 200) {
-        resetNewSessionForm();
+        resetForm();
       } 
     }).catch((error) => {
       console.log(error)
@@ -139,24 +126,27 @@ function SessionsList() {
         </div>
         <div className="col-lg-6 col-xl-4">
             <div className="border p-3">
-              <form onSubmit={handleNewSessionSubmit}>
-                <label className='fs-3 mb-3'>Crea una sessione</label>
+              <form onSubmit={handleFormSubmit}>
+                <label className='fs-3 mb-3'>Create a session</label>
                 <div className="mb-3">
-                  <label htmlFor="sessionNameInput" className="form-label">Nome sessione</label>
+                  <label htmlFor="sessionNameInput" className="form-label">Name</label>
                   <input type="text" className="form-control" id="sessionNameInput" value={formState.sessionName} onChange={handleFormChange}/>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Difficoltà gioco</label>
+                  <label className="form-label">Game mode</label>
                   <div className="d-flex flex-row">
                     {
-                      GAME_MODES.map((gm, index) => (
-                        <GameModeButton key={index} name={gm.name} config={gm} onclick={gameModeButtonClick} selected={formState.selectedGameMode === gm.id}/>
+                      gameModes.length == 0 ? 
+                      <p>No game mode available</p>
+                      :
+                      gameModes.map((gm, index) => (
+                        <GameModeButton key={index} name={gm.name} config={gm} onclick={gameModeButtonClick} selected={formState.selectedGameMode === gm.name}/>
                         ))
                       }
                   </div>
                 </div>
                 <div className="d-flex justify-content-end">
-                  <button className="btn btn-outline-seconday me-1" onClick={() => resetNewSessionForm()}>Annulla selezione</button>
+                  <button className="btn btn-outline-seconday me-1" onClick={() => resetForm()}>Annulla selezione</button>
                   <button type="submit" className="btn btn-primary">Crea</button>
                 </div>
               </form>

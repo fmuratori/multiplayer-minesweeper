@@ -4,9 +4,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SessionsManager {
-    private static final SessionsManager instance = new SessionsManager();
     private final Map<String, Session> sessions = new HashMap<>();
-    private SessionsManager() {}
+
+    public SessionsManager() {
+    }
 
     public Optional<Session> getSession(String roomId) {
         if (!sessions.containsKey(roomId))
@@ -23,10 +24,6 @@ public class SessionsManager {
 
     public void removeSession(String roomId) {
         sessions.remove(roomId);
-    }
-
-    public static SessionsManager getInstance() {
-        return instance;
     }
 
     public List<Session> getSessionsByMode(GameMode mode) {

@@ -7,6 +7,8 @@ public class GameStartingObject {
     private String roomName;
     private Session session;
 
+    public GameStartingObject() {}
+
     public GameStartingObject(String roomName, Session session) {
         this.roomName = roomName;
         this.session = session;
