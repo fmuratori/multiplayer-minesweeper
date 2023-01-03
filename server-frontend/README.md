@@ -1,9 +1,33 @@
-Per creare una immagine docker per il container
+# Multiplayer Minesweeper - Game server
 
-docker build -t mm-server-frontend .
+**API specification**
+
+[SwaggerHub](https://app.swaggerhub.com/apis/fmuratori/multiplayer-minesweeper-game-service/1.0.0)
 
 ---
 
-Per inizializzare un container ed il server node
+**To build the application**
 
-docker run -dp 8000:8000 mm-server-frontend
+`npm run build`
+
+Be sure to build the frontend independent project to the latest version.
+
+`cd ../frontend/`
+`npm run build`
+
+---
+
+**Build docker image**
+
+`
+docker build -t mm-server-frontend .
+`
+
+---
+
+**Running docker container, symbolic name frontendserver, source image mmm-server-frontend on network HOST**
+
+
+`
+docker run -it --rm --network host --name frontendserver mm-server-frontend
+`

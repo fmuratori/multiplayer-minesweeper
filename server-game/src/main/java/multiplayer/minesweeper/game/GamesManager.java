@@ -1,23 +1,21 @@
 package multiplayer.minesweeper.game;
 
+import multiplayer.minesweeper.gamemode.GameMode;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GamesManager {
-    private static final GamesManager instance = new GamesManager();
     private final Map<String, Game> activeGames = new ConcurrentHashMap<>();
 
-    private GamesManager() {}
-
-    public static GamesManager get() {
-        return instance;
+    public GamesManager() {
     }
 
-    public String newGame(int gridWidth, int gridHeight, float minesPercentage) {
+    public String newGame(GameMode mode) {
         String gameId = UUID.randomUUID().toString();
-        Game newInstance = new Game(gridWidth, gridHeight, minesPercentage);
+        Game newInstance = new Game(mode);
         newInstance.initialize();
         activeGames.put(gameId, newInstance);
         return gameId;
@@ -25,14 +23,6 @@ public class GamesManager {
 
     public void deleteGame(String roomId) {
         activeGames.remove(roomId);
-    }
-
-    public String testGame() {
-        String gameId = "test_room";
-        Game newInstance = new Game(30, 16, 0.2f);
-        newInstance.initialize();
-        activeGames.put(gameId, newInstance);
-        return gameId;
     }
 
     public Game getGameInstance(String roomId) {
@@ -48,5 +38,9 @@ public class GamesManager {
             }
         }
         return Optional.empty();
+    }
+
+    public Map<String, Game> getActiveGames() {
+        return activeGames;
     }
 }

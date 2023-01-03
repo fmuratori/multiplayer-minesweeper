@@ -1,12 +1,14 @@
 package multiplayer.minesweeper.game;
 
+import multiplayer.minesweeper.gamemode.GameMode;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Game {
-    private float minesPercentage = 0.4f;
+    private int numMines;
     private final int width;
     private final int height;
     private int visitedCount = 0;
@@ -17,13 +19,12 @@ public class Game {
 
     private boolean gameOverFlag = false;
     private boolean firstActionFlag = true;
-
     private final Set<UUID> connectedPlayers = new HashSet<>();
 
-    public Game(int width, int height, float minesPercentage) {
-        this.width = width;
-        this.height = height;
-        this.minesPercentage = minesPercentage;
+    public Game(GameMode mode) {
+        this.width = mode.getGridWidth();
+        this.height = mode.getGridHeight();
+        this.numMines = mode.getNumMines();
     }
 
     public Game(int width, int height) {
@@ -38,10 +39,9 @@ public class Game {
         initializeGrids();
 
         // add mines at random positions inside the grid
-        int num_mines = (int)((width * height) * minesPercentage);
         Random rand = new Random(System.currentTimeMillis());
         IntStream
-                .range(0,num_mines)
+                .range(0, numMines)
                 .map(i -> rand.nextInt(width * height))
                 .mapToObj(i -> new Coordinate(i / width, i % width))
                 .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
@@ -77,31 +77,49 @@ public class Game {
     }
 
     private void precomputeGridContent() {
-        for(int i = 0; i < height; i++) {
-            for(int j = 0; j < width; j++) {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
                 if (grid[i][j] == TileContent.MINE)
                     continue;
 
                 // automatically generate the "final grid" and initialize a new grid for visited tiles
                 int nearMinesCount = computeNearMinesCount(i, j);
                 switch (nearMinesCount) {
-                    case 0: grid[i][j] = TileContent.EMPTY; break;
-                    case 1: grid[i][j] = TileContent.NEAR_1; break;
-                    case 2: grid[i][j] = TileContent.NEAR_2; break;
-                    case 3: grid[i][j] = TileContent.NEAR_3; break;
-                    case 4: grid[i][j] = TileContent.NEAR_4; break;
-                    case 5: grid[i][j] = TileContent.NEAR_5; break;
-                    case 6: grid[i][j] = TileContent.NEAR_6; break;
-                    case 7: grid[i][j] = TileContent.NEAR_7; break;
-                    case 8: grid[i][j] = TileContent.NEAR_8; break;
+                    case 0:
+                        grid[i][j] = TileContent.EMPTY;
+                        break;
+                    case 1:
+                        grid[i][j] = TileContent.NEAR_1;
+                        break;
+                    case 2:
+                        grid[i][j] = TileContent.NEAR_2;
+                        break;
+                    case 3:
+                        grid[i][j] = TileContent.NEAR_3;
+                        break;
+                    case 4:
+                        grid[i][j] = TileContent.NEAR_4;
+                        break;
+                    case 5:
+                        grid[i][j] = TileContent.NEAR_5;
+                        break;
+                    case 6:
+                        grid[i][j] = TileContent.NEAR_6;
+                        break;
+                    case 7:
+                        grid[i][j] = TileContent.NEAR_7;
+                        break;
+                    case 8:
+                        grid[i][j] = TileContent.NEAR_8;
+                        break;
                 }
             }
         }
 
         visitedCount = 0;
 
-        for(int i = 0; i < height; i++)
-            for(int j = 0; j < width; j++)
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
                 if (grid[i][j] != TileContent.MINE)
                     toVisitCount++;
     }
@@ -109,14 +127,14 @@ public class Game {
     private int computeNearMinesCount(int i, int j) {
         AtomicInteger near_mines = new AtomicInteger();
         Stream.of(
-                new Coordinate(i-1, j-1),
-                new Coordinate(i-1, j),
-                new Coordinate(i-1, j+1),
-                new Coordinate(i, j-1),
-                new Coordinate(i, j+1),
-                new Coordinate(i+1, j-1),
-                new Coordinate(i+1, j),
-                new Coordinate(i+1, j+1)
+                new Coordinate(i - 1, j - 1),
+                new Coordinate(i - 1, j),
+                new Coordinate(i - 1, j + 1),
+                new Coordinate(i, j - 1),
+                new Coordinate(i, j + 1),
+                new Coordinate(i + 1, j - 1),
+                new Coordinate(i + 1, j),
+                new Coordinate(i + 1, j + 1)
         ).parallel().forEach(c -> {
             if (c.x >= 0 && c.x < height && c.y >= 0 && c.y < width) {
                 if (grid[c.x][c.y] == TileContent.MINE)
@@ -130,10 +148,9 @@ public class Game {
     /**
      * Execute an action on the game grid at a given coordinate.
      *
-     * @param x the row coordinate
-     * @param y the column coordinate
+     * @param x          the row coordinate
+     * @param y          the column coordinate
      * @param actionType the action to be executed
-     *
      * @return the result of an action.
      */
     public synchronized ActionResult action(int x, int y, ActionType actionType) {
@@ -190,14 +207,14 @@ public class Game {
         gridState[x][y] = TileState.VISITED;
         visitedCount++;
         if (grid[x][y] == TileContent.EMPTY) {
-            visitAndExpand(x+1, y);
-            visitAndExpand(x-1, y);
-            visitAndExpand(x, y+1);
-            visitAndExpand(x, y-1);
-            visitAndExpand(x+1, y+1);
-            visitAndExpand(x+1, y-1);
-            visitAndExpand(x-1, y+1);
-            visitAndExpand(x-1, y-1);
+            visitAndExpand(x + 1, y);
+            visitAndExpand(x - 1, y);
+            visitAndExpand(x, y + 1);
+            visitAndExpand(x, y - 1);
+            visitAndExpand(x + 1, y + 1);
+            visitAndExpand(x + 1, y - 1);
+            visitAndExpand(x - 1, y + 1);
+            visitAndExpand(x - 1, y - 1);
         }
     }
 
@@ -205,17 +222,17 @@ public class Game {
      * Returns the current state of the grid as a matrix of integer values representing each tile type.
      */
     public synchronized String toString() {
-        String[] output = new String[height*width];
+        String[] output = new String[height * width];
 
-        for(int i = 0; i < height; i++) {
-            for(int j = 0; j < width; j++) {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
                 String value;
                 if (gridState[i][j] == TileState.VISITED || (gameOverFlag && gridState[i][j] != TileState.EXPLODED)) {
                     value = grid[i][j].value;
                 } else {
                     value = gridState[i][j].value;
                 }
-                output[ i*width + j] = value;
+                output[i * width + j] = value;
             }
         }
 

@@ -11,7 +11,7 @@ function SessionsList() {
   const navigate = useNavigate();
   const [formState, setFormState] = useState({
     sessionName:'',
-    selectedGameMode:''
+    gameMode: null,
   })
   const [gameModes, setGameModes] = useState([]);
   
@@ -49,7 +49,6 @@ function SessionsList() {
 
 
     getGameModes().then((response) => {
-      console.log(response);
       if (response.status === 200) {
         setGameModes(response.data);
       } 
@@ -69,17 +68,17 @@ function SessionsList() {
     navigate('/session', { state: {roomId: roomId, sessionName: sessionName} });
   }
 
-  function gameModeButtonClick(gameModeId) {
+  function gameModeButtonClick(gameMode) {
     setFormState({
       ...formState,
-      selectedGameMode: gameModeId,
+      gameMode: gameMode,
     })
   }
 
   function resetForm() {
     setFormState({
       sessionName:'',
-      selectedGameMode:null
+      gameMode: null
     })
   }
 
@@ -91,12 +90,21 @@ function SessionsList() {
 
   function handleFormSubmit(e) {
     e.preventDefault();
-    if (formState.sessionName === '' || formState.selectedGameMode === null) {
+    if (formState.sessionName === '' || formState.gameMode === null) {
       console.log("ERROR")
       return
     }
 
-    postNewSession(formState).then((response) => {
+    const newSession = {
+      name: formState.sessionName,
+      mode: formState.gameMode.name,
+      numPlayers: formState.gameMode.numPlayers,
+      numMines: formState.gameMode.numMines,
+      gridWidth: formState.gameMode.gridWidth,
+      gridHeight: formState.gameMode.gridHeight,
+    }
+
+    postNewSession(newSession).then((response) => {
       if (response.status === 200) {
         resetForm();
       } 
@@ -110,11 +118,11 @@ function SessionsList() {
       <div className='row justify-content-center'>
         <div className='col-lg-6 col-xl-4'>
           <div className='border p-3'>
-            <label className='fs-3 mb-3'>Lista sessioni</label>
+            <label className='fs-3 mb-3'>Available sessions</label>
             <div>
               { sessions.length === 0 ?
                 <p className="text-center">
-                  Nessuna sessione disponibile
+                  Sessions not found
                 </p>
                 :
                 sessions.map((s, index) =>
@@ -125,32 +133,32 @@ function SessionsList() {
           </div>
         </div>
         <div className="col-lg-6 col-xl-4">
-            <div className="border p-3">
-              <form onSubmit={handleFormSubmit}>
-                <label className='fs-3 mb-3'>Create a session</label>
-                <div className="mb-3">
-                  <label htmlFor="sessionNameInput" className="form-label">Name</label>
-                  <input type="text" className="form-control" id="sessionNameInput" value={formState.sessionName} onChange={handleFormChange}/>
+          <div className="border p-3 mt-md-4 mt-lg-0">
+            <form onSubmit={handleFormSubmit}>
+              <label className='fs-3 mb-3'>Create a session</label>
+              <div className="mb-3">
+                <label htmlFor="sessionNameInput" className="form-label">Name</label>
+                <input type="text" className="form-control" id="sessionNameInput" value={formState.sessionName} onChange={handleFormChange}/>
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Game mode</label>
+                <div className="d-flex flex-row">
+                  {
+                    gameModes.length === 0 ? 
+                    <p>No game mode available</p>
+                    :
+                    gameModes.map((gm, index) => (
+                      <GameModeButton key={index} name={gm.name} config={gm} onclick={gameModeButtonClick} selected={formState.gameMode === gm}/>
+                      ))
+                    }
                 </div>
-                <div className="mb-3">
-                  <label className="form-label">Game mode</label>
-                  <div className="d-flex flex-row">
-                    {
-                      gameModes.length == 0 ? 
-                      <p>No game mode available</p>
-                      :
-                      gameModes.map((gm, index) => (
-                        <GameModeButton key={index} name={gm.name} config={gm} onclick={gameModeButtonClick} selected={formState.selectedGameMode === gm.name}/>
-                        ))
-                      }
-                  </div>
-                </div>
-                <div className="d-flex justify-content-end">
-                  <button className="btn btn-outline-seconday me-1" onClick={() => resetForm()}>Annulla selezione</button>
-                  <button type="submit" className="btn btn-primary">Crea</button>
-                </div>
-              </form>
-            </div>
+              </div>
+              <div className="d-flex justify-content-end">
+                <button className="btn btn-outline-seconday me-1" onClick={() => resetForm()}>Reset</button>
+                <button type="submit" className="btn btn-primary">Submit</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

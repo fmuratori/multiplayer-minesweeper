@@ -32,8 +32,15 @@
 docker build -t mm-server-session .
 `
 
-**Running docker container**
+**Running docker container, symbolic name sessioneserver, source image mmm-server-session on default network BRIDGE**
 
 `
-docker run -p 8002:8002 -p 8001:8001 mm-server-session
+docker run -p 8002:8002 -p 8001:8001 -it --rm --name sessionserver mm-server-session
+`
+
+
+**Running docker container, symbolic name sessioneserver, source image mmm-server-session on network HOST**
+
+`
+docker run -it --rm --link gameserver --network host --name sessionserver mm-server-session
 `

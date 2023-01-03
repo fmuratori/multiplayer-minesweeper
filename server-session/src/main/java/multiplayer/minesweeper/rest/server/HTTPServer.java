@@ -11,7 +11,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CorsHandler;
-import multiplayer.minesweeper.sessions.GameMode;
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.sessions.SessionsManager;
 import multiplayer.minesweeper.socket.SocketServer;
@@ -34,16 +33,19 @@ public class HTTPServer extends AbstractVerticle {
             final JsonObject body = bodyHandler.toJsonObject();
             System.out.println("[HTTP Server] - Received new-session request. Body: " + body);
 
-            String sessionName = body.getString("sessionName");
-            GameMode mode = GameMode.getEnum(body.getString("selectedGameMode"));
+            String sessionName = body.getString("name");
+            String mode = body.getString("mode");
+            int numPlayers = body.getInteger("numPlayers");
+            int gridWidth = body.getInteger("gridWidth");
+            int gridHeight = body.getInteger("gridHeight");
             String roomId = UUID.randomUUID().toString();
-            Session newSession = sessionsManager.addSession(roomId, sessionName, mode);
+            Session newSession = sessionsManager.addSession(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
             SocketServer.get().emitSessionUpdate(newSession);
 
             rc.response()
                     .putHeader("content-type",
                             "application/json; charset=utf-8")
-                    .end(Json.encodePrettily(roomId));
+                    .end();
         });
     }
 

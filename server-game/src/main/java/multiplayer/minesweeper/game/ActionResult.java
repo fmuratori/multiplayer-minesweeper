@@ -8,7 +8,7 @@ public enum ActionResult {
 
     public final String label;
 
-    private ActionResult(String label) {
+    ActionResult(String label) {
         this.label = label;
     }
 }

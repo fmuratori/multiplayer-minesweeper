@@ -3,7 +3,7 @@ import './GameModeButton.scss';
 function GameModeButton(props) {
 
   return (
-    <div className="container px-1" onClick={() => props.onclick(props.config.name)}>
+    <div className="container px-1" onClick={() => props.onclick(props.config)}>
       <div className={`border py-4 my-big-button` + (props.selected ? ` my-selected-button` : ``)}>
         <p className="text-center mb-2">
           <span className="fs-4"> {props.name} </span>

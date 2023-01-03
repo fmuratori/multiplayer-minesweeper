@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GameTest {
+public class TestGame {
 
     private Game gameManager = null;
     private final int GRID_WIDTH = 4;
@@ -115,10 +115,4 @@ public class GameTest {
         assertEquals(result3, ActionResult.OK);
         assertEquals(result4, ActionResult.GAME_OVER);
     }
-
-
-//    @Test
-//    public void testFirstActionIsExplosion() {
-//
-//    }
 }

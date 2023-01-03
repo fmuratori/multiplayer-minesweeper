@@ -5,20 +5,26 @@ package multiplayer.minesweeper.rest;
 
 import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CorsHandler;
 import multiplayer.minesweeper.game.GamesManager;
+import multiplayer.minesweeper.gamemode.GameMode;
 import multiplayer.minesweeper.gamemode.GameModeFactory;
 
 public class HttpServer extends AbstractVerticle {
-    private final static HttpServer instance = new HttpServer();
     private final Gson gson;
+    private final GamesManager gamesManager;
+    private final int port;
 
-    private HttpServer() {
+    public HttpServer(Vertx vertx, int port, GamesManager manager) {
+        this.gamesManager = manager;
+        this.port = port;
         gson = new Gson();
+        vertx.deployVerticle(this);
     }
 
     private void createNewGame(RoutingContext rc) {
@@ -26,19 +32,13 @@ public class HttpServer extends AbstractVerticle {
         rc.request().bodyHandler(bodyHandler -> {
             final JsonObject body = bodyHandler.toJsonObject();
 
-            System.out.println("Received POST new-game request. Body: " + body);
+            System.out.println("[HTTP Server] - Received POST new-game request. Body: " + body);
 
-            int gridWidth = body.getInteger("gridWidth");
-            int gridHeight = body.getInteger("gridHeight");
-            float minesPercentage = body.getFloat("minesPercentage");
-            // number of players that joined the session
-            int numConnectedPlayers = body.getInteger("numConnectedPlayers");
-            // max number of allowed players inside a single session
-            int numPlayers = body.getInteger("numPlayers");
+            String name = body.getString("name");
+            GameMode gameMode = GameModeFactory.getByName(name);
+            String gameId = gamesManager.newGame(gameMode);
 
-            String gameId = GamesManager.get().newGame(gridWidth, gridHeight, minesPercentage);
-
-            System.out.println("Created new-game, created Socketio room: " + gameId);
+            System.out.println("[HTTP Server] - Created new-game, created Socket.IO room: " + gameId);
 
             rc.response()
                     .putHeader("content-type",
@@ -50,7 +50,7 @@ public class HttpServer extends AbstractVerticle {
 
     private void getGameModes(RoutingContext rc) {
         rc.request().bodyHandler(bodyHandler -> {
-            System.out.println("Received GET game-modes request. ");
+            System.out.println("[HTTP Server] - Received GET game-modes request. ");
             rc.response()
                     .putHeader("content-type",
                             "application/json; charset=utf-8")
@@ -72,15 +72,16 @@ public class HttpServer extends AbstractVerticle {
 
         vertx.createHttpServer()
                 .requestHandler(router)
-                .listen(8003)
+                .listen(port)
                 .onSuccess(server ->
                         System.out.println(
-                                "HTTP server started on port " + server.actualPort()
+                                "[HTTP Server] - Http server started on port " + server.actualPort()
                         )
                 );
     }
 
-    public static HttpServer getInstance() {
-        return instance;
+    public void close() {
+        System.out.println("[HTTP Server] - Terminating http server");
+        vertx.close();
     }
 }

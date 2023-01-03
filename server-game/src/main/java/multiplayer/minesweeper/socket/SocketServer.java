@@ -11,10 +11,12 @@ import java.util.*;
 
 public class SocketServer {
 
-    private static final SocketServer instance = new SocketServer();
+    private final GamesManager gamesManager;
     private SocketIOServer server;
 
-    private SocketServer() {}
+    public SocketServer(GamesManager manager) {
+        this.gamesManager = manager;
+    }
 
     public void initialize(int port) {
         Configuration config = new Configuration();
@@ -22,13 +24,11 @@ public class SocketServer {
         config.setPort(port);
 
         server = new SocketIOServer(config);
-        server.addConnectListener((client) -> {
-            System.out.println("Socket ID ["+client.getSessionId().toString()+"] - Connected to socket");
-        });
+        server.addConnectListener((client) -> System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Connected to socket"));
         server.addDisconnectListener(client -> {
-            System.out.println("Socket ID ["+client.getSessionId().toString()+"] - Disconnected from socket");
+            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Disconnected from socket");
 
-            Optional<String> roomId = GamesManager.get().findGameByUser(client.getSessionId());
+            Optional<String> roomId = gamesManager.findGameByUser(client.getSessionId());
             if (roomId.isPresent()) {
                 int connectedClients = server.getRoomOperations(roomId.get()).getClients().size();
                 server.getRoomOperations(roomId.get()).sendEvent("players_count_update",
@@ -38,13 +38,13 @@ public class SocketServer {
         });
 
         server.addEventListener("action", ActionObject.class, (client, data, ackSender) -> {
-            System.out.println("Socket ID ["+client.getSessionId().toString()+"] - " + data.toString());
+            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
 
             Optional<String> roomId = client.getAllRooms().stream().filter((name) -> !name.equals("")).findFirst();
             if (roomId.isEmpty())
-                throw new IllegalStateException("Socket ID ["+client.getSessionId().toString()+"] Room not found");
+                throw new IllegalStateException("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] Room not found");
 
-            Game game = GamesManager.get().getGameInstance(roomId.get());
+            Game game = gamesManager.getGameInstance(roomId.get());
 
             ActionType requestedAction = ActionType.valueOf(data.getAction());
             ActionResult result = game.action(data.getxCoordinate(), data.getyCoordinate(), requestedAction);
@@ -68,10 +68,10 @@ public class SocketServer {
             }
         });
         server.addEventListener("join_room", JoinRoomObject.class, (client, data, ackSender) -> {
-            System.out.println("Socket ID ["+client.getSessionId().toString()+"] - " + data.toString());
-            // add user to one game sessione
+            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
+            // add user to one game session
             client.joinRoom(data.getRoomName());
-            Game game = GamesManager.get().getGameInstance(data.getRoomName());
+            Game game = gamesManager.getGameInstance(data.getRoomName());
             // TODO: reject connection if a game with the specified roomName is not found (possible frontend page refresh)
             game.addPlayer(client.getSessionId());
             String map = game.toString();
@@ -83,11 +83,10 @@ public class SocketServer {
                     new NewConnectionObject(connectedClients));
         });
         server.addEventListener("leave_room", JoinRoomObject.class, (client, data, ackSender) -> {
-            System.out.println("Socket ID ["+client.getSessionId().toString()+"] - " + data.toString());
-            // add user to one game sessione
+            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
+            // remove user from one game session
             client.leaveRoom(data.getRoomName());
-            GamesManager
-                    .get()
+            gamesManager
                     .getGameInstance(data.getRoomName())
                     .removePlayer(client.getSessionId());
             // send new user connection to all connected users
@@ -97,21 +96,18 @@ public class SocketServer {
         });
         server.start();
 
-        System.out.println("SocketIO server started on port " + port);
+        System.out.println("[Socket.IO] - SocketIO server started on port " + port);
     }
 
     private void checkAndDeleteGame(String roomId) {
         if (server.getRoomOperations(roomId).getClients().size() == 0) {
-            GamesManager.get().deleteGame(roomId);
+            gamesManager.deleteGame(roomId);
         }
     }
 
-    public void stopServer() {
+    public void close() {
+        System.out.println("[Socket.IO] - Terminating Socket.IO server");
         server.stop();
-    }
-
-    public static SocketServer getInstance() {
-        return instance;
     }
 
 }

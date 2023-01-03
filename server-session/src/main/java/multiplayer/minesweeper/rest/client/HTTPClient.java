@@ -22,11 +22,7 @@ public class HTTPClient {
     public void sendGameRequest(String sessionRoomName, Session session) {
         client.post(serverPort, serverHost, "/new-game").sendJsonObject(
                         new JsonObject()
-                                .put("gridWidth", session.getGameMode().getGridWidth())
-                                .put("gridHeight", session.getGameMode().getGridHeight())
-                                .put("numPlayers", session.getGameMode().getNumPlayers())
-                                .put("numConnectedPlayers", session.getNumConnectedUsers())
-                                .put("minesPercentage", session.getGameMode().getMinesPercentage()))
+                                .put("name", session.getGameMode()))
                 .onSuccess(response -> {
                     if (response.statusCode() == 200) {
                         System.out.println("[HTTP Client] - Received response with status code " + response.bodyAsString());

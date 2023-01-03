@@ -60,9 +60,9 @@ public class SocketServer {
 
                 // send new user connection to all connected users
                 int connectedClients = sessionNamespace.getRoomOperations(roomName).getClients().size();
-                sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getGameMode().getNumPlayers()));
+                sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getNumPlayers()));
 
-                if (connectedClients == session.get().getGameMode().getNumPlayers()) {
+                if (connectedClients == session.get().getNumPlayers()) {
                     System.out.println("[Socket.IO] - Starting game for room " + roomName);
 
                     gameServerClient.sendGameRequest(roomName, session.get());
@@ -89,7 +89,7 @@ public class SocketServer {
 
                 // send new user connection to all connected users
                 int connectedClients = server.getRoomOperations(roomName).getClients().size();
-                server.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getGameMode().getNumPlayers()));
+                server.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getNumPlayers()));
 
 //                if (connectedClients == 0) {
 //                    SessionsManager.getInstance().removeSession(roomName);

@@ -16,8 +16,8 @@ public class SessionsManager {
             return Optional.of(sessions.get(roomId));
     }
 
-    public Session addSession(String roomId, String sessionName, GameMode mode) {
-        Session newSession = new Session(roomId, sessionName, mode);
+    public Session addSession(String roomId, String sessionName, String mode, int numPlayers, int gridWidth, int  gridHeight) {
+        Session newSession = new Session(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
         sessions.put(roomId, newSession);
         return newSession;
     }
@@ -26,7 +26,7 @@ public class SessionsManager {
         sessions.remove(roomId);
     }
 
-    public List<Session> getSessionsByMode(GameMode mode) {
+    public List<Session> getSessionsByMode(String mode) {
         return sessions
                 .values()
                 .stream()

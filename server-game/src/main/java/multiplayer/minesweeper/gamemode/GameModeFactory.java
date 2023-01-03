@@ -20,4 +20,12 @@ public class GameModeFactory {
         return Arrays.asList(smallGrid(), mediumGrid(), bigGrid());
     }
 
+    public static GameMode getByName(String name) {
+        switch (name) {
+            case "MEDIUM": return mediumGrid();
+            case "BIG": return bigGrid();
+            default: return smallGrid();
+        }
+    }
+
 }

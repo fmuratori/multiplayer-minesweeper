@@ -1,8 +1,7 @@
 import axios from "axios";
 
-// move baseULR into config file
-const sessionsServerBaseURL = "http://127.0.0.1:8001";
-const gameServerBaseURL = "http://127.0.0.1:8003";
+const sessionsServerBaseURL = process.env.REACT_APP_SESSION_SERVER_URL;
+const gameServerBaseURL = process.env.REACT_APP_GAME_SERVER_URL;
 
 
 export function getSessions() {

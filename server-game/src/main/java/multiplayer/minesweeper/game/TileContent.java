@@ -11,7 +11,7 @@ public enum TileContent {
      */
     public final String value;
 
-    private TileContent(String value) {
+    TileContent(String value) {
         this.value = value;
     }
 }

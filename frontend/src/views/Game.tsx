@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import React, { useState } from 'react';
 import {gameSocket} from '../scripts/GameSocket';
 import './Game.css';
@@ -50,22 +50,6 @@ function Game() {
       updateMap(data["map"]);
     });
 
-    gameSocket.open();
-
-    setEmptyGrid();
-
-    return () => {
-      gameSocket.off("connect");
-      gameSocket.off("disconnect");
-      gameSocket.off('players_count_update');
-      gameSocket.off('game_won');
-      gameSocket.off('game_lost');
-      gameSocket.off('game_update');
-      gameSocket.close();
-    };
-  }, []);
-
-  function setEmptyGrid() {
     // set the empty grid
     var map: string[][] = [];
     for (var i = 0; i < state.session.gridHeight; i++) {
@@ -76,7 +60,20 @@ function Game() {
       map[i] = row;
     }
     setMap(map);
-  }
+    
+    gameSocket.open();
+    
+    return () => {
+      gameSocket.off("connect");
+      gameSocket.off("disconnect");
+      gameSocket.off('players_count_update');
+      gameSocket.off('game_won');
+      gameSocket.off('game_lost');
+      gameSocket.off('game_update');
+      gameSocket.close();
+    };
+  // eslint-disable-next-line
+  }, []);
 
   function updateMap(newStringMap:string) {
     var tilesList: string[] = newStringMap.split(" ");
@@ -188,7 +185,7 @@ function Game() {
     <div>
       <div className=" container-fluid p-3">
         <div className="row justify-content-center">
-          <div className={`border rounded ` + (state.session.gridWidth == 30 ? `col-12` : state.session.gridWidth == 16 ? `col-xl-auto col-lg-12` : `col-xl-auto col-lg-10 col-md-12`)}>
+          <div className={`border rounded ` + (state.session.gridWidth === 30 ? `col-12` : state.session.gridWidth === 16 ? `col-xl-auto col-lg-12` : `col-xl-auto col-lg-10 col-md-12`)}>
             <div className="row align-items-center justify-content-center text-center m-4">
               <div className='col-auto'>
                 <table>

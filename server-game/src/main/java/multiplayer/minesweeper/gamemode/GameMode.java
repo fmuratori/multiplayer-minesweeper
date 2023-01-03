@@ -1,10 +1,5 @@
 package multiplayer.minesweeper.gamemode;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class GameMode {
 
     private final String name;
@@ -12,7 +7,7 @@ public class GameMode {
     private final int gridHeight;
     private final int numPlayers;
 
-    private final float numMines;
+    private final int numMines;
 
     GameMode(String name, int gridWidth, int gridHeight, int numPlayers, int numMines) {
         this.name = name;
@@ -38,7 +33,7 @@ public class GameMode {
         return numPlayers;
     }
 
-    public float getNumMines() {
+    public int getNumMines() {
         return numMines;
     }
 }
