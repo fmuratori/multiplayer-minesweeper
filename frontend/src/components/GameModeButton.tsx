@@ -1,4 +1,4 @@
-import './GameModeButton.scss';
+import './GameModeButton.css';
 
 function GameModeButton(props) {
 

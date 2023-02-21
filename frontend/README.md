@@ -1,41 +1,44 @@
-# Getting Started with Create React App
+# Multiplayer Minesweeper - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**API specification**
 
-## Available Scripts
+[SwaggerHub](https://app.swaggerhub.com/apis/fmuratori/multiplayer-minesweeper-game-service/1.0.0)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+**To build the application**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+`npm run build`
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+**To start the application**
 
-### `npm run build`
+`npm run start`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Build docker image**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`
+docker build -t mmfrontend .
+`
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**Running docker container, symbolic name sessioneserver, source image mmmsession on default network BRIDGE**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Flags:
+- -p      : map host ports to container ports
+- -it     : for interactive mode
+- --rm    : to remove previous versions of the container
+- --name  : give a name to the container 
+- --net   : specify the container network
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+`
+docker run \
+    -p 3000:3000 \
+    -it \
+    --rm \
+    --network mmnetwork \
+    --name mmfrontend \
+    --ip 172.18.0.10 \
+    mmfrontend
+`

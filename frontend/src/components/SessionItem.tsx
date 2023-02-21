@@ -1,5 +1,4 @@
 import React from 'react';
-import './SessionItem.scss';
 import moment from 'moment';
 
 function SessionItem(props) {
