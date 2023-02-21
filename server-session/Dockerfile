@@ -6,10 +6,12 @@ WORKDIR /app
 COPY . .
 
 RUN gradle build
-CMD ["gradle", "run"]
+
 
 # PORTS:
 # - 8001: Http server
 # - 8002: Socket.IO server
-# EXPOSE 8001
-# EXPOSE 8002
+EXPOSE 8001
+EXPOSE 8002
+
+CMD ["gradle", "run"]

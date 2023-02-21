@@ -7,14 +7,17 @@ import multiplayer.minesweeper.cli.CLIActions;
 import multiplayer.minesweeper.rest.client.HTTPClient;
 import multiplayer.minesweeper.socket.SocketServer;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnknownHostException {
 
         SessionsManager sessionsManager = new SessionsManager();
         Vertx vertx = Vertx.vertx();
 
         // client for the communication between this server and server-game
-        HTTPClient restClient = new HTTPClient(vertx, "0.0.0.0", 8003);
+        HTTPClient restClient = new HTTPClient(vertx, "172.18.0.12", 8003);
 
         // start http server
         HTTPServer restServer = new HTTPServer(vertx, sessionsManager, 8001);

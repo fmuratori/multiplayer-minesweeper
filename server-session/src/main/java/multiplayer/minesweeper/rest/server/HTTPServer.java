@@ -6,7 +6,6 @@ package multiplayer.minesweeper.rest.server;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -33,19 +32,33 @@ public class HTTPServer extends AbstractVerticle {
             final JsonObject body = bodyHandler.toJsonObject();
             System.out.println("[HTTP Server] - Received new-session request. Body: " + body);
 
-            String sessionName = body.getString("name");
-            String mode = body.getString("mode");
-            int numPlayers = body.getInteger("numPlayers");
-            int gridWidth = body.getInteger("gridWidth");
-            int gridHeight = body.getInteger("gridHeight");
-            String roomId = UUID.randomUUID().toString();
-            Session newSession = sessionsManager.addSession(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
-            SocketServer.get().emitSessionUpdate(newSession);
+            try {
+                String sessionName = body.getString("name");
+                String mode = body.getString("mode");
+                int numPlayers = body.getInteger("numPlayers");
+                int gridWidth = body.getInteger("gridWidth");
+                int gridHeight = body.getInteger("gridHeight");
 
-            rc.response()
-                    .putHeader("content-type",
-                            "application/json; charset=utf-8")
-                    .end();
+                if (sessionName.isBlank() || mode.isBlank()) {
+                    throw new IllegalArgumentException();
+                }
+
+                String roomId = UUID.randomUUID().toString();
+                Session newSession = sessionsManager.addSession(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
+                SocketServer.get().emitSessionUpdate(newSession);
+
+                rc.response()
+                        .setStatusCode(200)
+                        .putHeader("content-type",
+                                "application/json; charset=utf-8")
+                        .end();
+            } catch (Exception e) {
+                rc.response()
+                        .setStatusCode(400)
+                        .putHeader("content-type",
+                                "application/json; charset=utf-8")
+                        .end();
+            }
         });
     }
 

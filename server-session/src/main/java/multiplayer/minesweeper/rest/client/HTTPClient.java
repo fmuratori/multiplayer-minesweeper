@@ -34,7 +34,7 @@ public class HTTPClient {
                 })
                 .onFailure(err -> {
                     SocketServer.get().gameStartingResponse(sessionRoomName, null);
-                    System.out.println("[HTTP Client] - Unable to connect with the server " + err.getMessage());
+                    System.out.println("[HTTP Client] - Unable to connect with the server. Error: " + err.getMessage());
                 });
     }
 }

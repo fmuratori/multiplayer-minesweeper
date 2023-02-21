@@ -31,7 +31,6 @@ public class SocketServer {
         this.sessionsManager = manager;
 
         Configuration config = new Configuration();
-//        config.setHostname("0.0.0.0");
         config.setPort(port);
 
         server = new SocketIOServer(config);
@@ -90,15 +89,7 @@ public class SocketServer {
                 // send new user connection to all connected users
                 int connectedClients = server.getRoomOperations(roomName).getClients().size();
                 server.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getNumPlayers()));
-
-//                if (connectedClients == 0) {
-//                    SessionsManager.getInstance().removeSession(roomName);
-//                    browseNamespace.getBroadcastOperations()
-//                            .sendEvent("session_update",
-//                                    new SessionUpdateObject(session.get(), SessionUpdateType.CLOSED));
-//                } else {
                 browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session.get(), SessionUpdateType.REMOVED_USER));
-//                }
             }
         });
 

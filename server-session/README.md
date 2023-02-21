@@ -29,18 +29,26 @@
 **Build docker image**
 
 `
-docker build -t mm-server-session .
+docker build -t mmsession .
 `
 
-**Running docker container, symbolic name sessioneserver, source image mmm-server-session on default network BRIDGE**
+**Running docker container**
+
+Flags:
+- -p      : map host ports to container ports
+- -it     : for interactive mode
+- --rm    : to remove previous versions of the container
+- --name  : give a name to the container 
+- --net   : specify the container network
 
 `
-docker run -p 8002:8002 -p 8001:8001 -it --rm --name sessionserver mm-server-session
-`
-
-
-**Running docker container, symbolic name sessioneserver, source image mmm-server-session on network HOST**
-
-`
-docker run -it --rm --link gameserver --network host --name sessionserver mm-server-session
+docker run \
+    -p 8001:8001 \
+    -p 8002:8002 \
+    -it \
+    --rm \
+    --network mmnetwork \
+    --name mmsession \
+    --ip 172.18.0.11 \
+    mmsession
 `
