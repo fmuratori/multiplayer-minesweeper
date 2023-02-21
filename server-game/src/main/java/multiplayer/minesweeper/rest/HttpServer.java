@@ -6,6 +6,7 @@ package multiplayer.minesweeper.rest;
 import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
@@ -30,20 +31,36 @@ public class HttpServer extends AbstractVerticle {
     private void createNewGame(RoutingContext rc) {
 
         rc.request().bodyHandler(bodyHandler -> {
-            final JsonObject body = bodyHandler.toJsonObject();
+            final JsonObject body;
+            try {
+                body = bodyHandler.toJsonObject();
+            } catch (DecodeException e) {
+                System.out.println("[HTTP Server] - New-game creation error. Body content decoding error.");
+                rc.response()
+                        .setStatusCode(400)
+                        .end();
+                return;
+            }
 
             System.out.println("[HTTP Server] - Received POST new-game request. Body: " + body);
 
-            String name = body.getString("name");
-            GameMode gameMode = GameModeFactory.getByName(name);
-            String gameId = gamesManager.newGame(gameMode);
+            try {
+                String name = body.getString("name");
+                GameMode gameMode = GameModeFactory.getByName(name);
+                String gameId = gamesManager.newGame(gameMode);
+                System.out.println("[HTTP Server] - Created new-game, created Socket.IO room: " + gameId);
+                rc.response()
+                        .setStatusCode(200)
+                        .putHeader("content-type",
+                                "application/json; charset=utf-8")
+                        .end(gameId);
+            } catch (IllegalArgumentException e) {
+                System.out.println("[HTTP Server] - New-game creation error. Game mode not found");
+                rc.response()
+                        .setStatusCode(400)
+                        .end();
 
-            System.out.println("[HTTP Server] - Created new-game, created Socket.IO room: " + gameId);
-
-            rc.response()
-                    .putHeader("content-type",
-                            "application/json; charset=utf-8")
-                    .end(gameId);
+            }
         });
     }
 

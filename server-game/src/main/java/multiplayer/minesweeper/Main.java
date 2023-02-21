@@ -6,8 +6,23 @@ import multiplayer.minesweeper.game.GamesManager;
 import multiplayer.minesweeper.rest.HttpServer;
 import multiplayer.minesweeper.socket.SocketServer;
 
-public class Main {
-    public static void main(String[] args) {
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+public class Main {    
+    // public static String resolve(String containerName) throws UnknownHostException {
+    //     String hostName = InetAddress.getByName(containerName).getHostName();
+    //     String ipAddress = InetAddress.getByName(containerName).getHostAddress();
+    //     System.out.println("Resolved container name: " + containerName);
+    //     System.out.println("Resolved container hostname: " + hostName);
+    //     System.out.println("Resolved container IP address: " + ipAddress);
+    //     System.out.println("=====================================");
+    //     return ipAddress;
+    // }
+
+    public static void main(String[] args) throws UnknownHostException {
+
+        // String host = resolve("gameserver");
 
         GamesManager manager = new GamesManager();
 

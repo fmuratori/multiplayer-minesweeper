@@ -24,7 +24,8 @@ public class GameModeFactory {
         switch (name) {
             case "MEDIUM": return mediumGrid();
             case "BIG": return bigGrid();
-            default: return smallGrid();
+            case "SMALL": return smallGrid();
+            default: throw new IllegalArgumentException();
         }
     }
 

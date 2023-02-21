@@ -29,18 +29,26 @@
 **Build docker image**
 
 `
-docker build -t mm-server-game .
+docker build -t mmgame .
 `
 
 **Running docker container**
 
-`
-docker run -p 8003:8003 -p 8004:8004 -it --rm --name gameserver mm-server-game
-`
+Flags:
+- -p      : map host ports to container ports
+- -it     : for interactive mode
+- --rm    : to remove previous versions of the container
+- --name  : give a name to the container 
+- --net   : specify the container network
 
-
-**Running docker container, symbolic name gameserver, source image mmm-server-game on network HOST**
-
 `
-docker run -it --rm --network host --name gameserver mm-server-game
+docker run \
+    -p 8003:8003 \
+    -p 8004:8004 \
+    -it \
+    --rm \
+    --network mmnetwork \
+    --ip 172.18.0.12 \
+    --name mmgame \
+    mmgame
 `
