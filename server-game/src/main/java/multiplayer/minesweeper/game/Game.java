@@ -2,15 +2,18 @@ package multiplayer.minesweeper.game;
 
 import multiplayer.minesweeper.gamemode.GameMode;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Game {
-    private int numMines;
-    private final int width;
-    private final int height;
+    private final GameMode gameMode;
+
+    private Instant startedAt;
+    private Duration duration;
     private int visitedCount = 0;
     private int toVisitCount = 0;
 
@@ -22,14 +25,8 @@ public class Game {
     private final Set<UUID> connectedPlayers = new HashSet<>();
 
     public Game(GameMode mode) {
-        this.width = mode.getGridWidth();
-        this.height = mode.getGridHeight();
-        this.numMines = mode.getNumMines();
-    }
-
-    public Game(int width, int height) {
-        this.width = width;
-        this.height = height;
+        this.gameMode = mode;
+        this.startedAt = Instant.now();
     }
 
     /**
@@ -41,9 +38,9 @@ public class Game {
         // add mines at random positions inside the grid
         Random rand = new Random(System.currentTimeMillis());
         IntStream
-                .range(0, numMines)
-                .map(i -> rand.nextInt(width * height))
-                .mapToObj(i -> new Coordinate(i / width, i % width))
+                .range(0, gameMode.getNumMines())
+                .map(i -> rand.nextInt(gameMode.getGridWidth() * gameMode.getGridHeight()))
+                .mapToObj(i -> new Coordinate(i / gameMode.getGridWidth(), i % gameMode.getGridWidth()))
                 .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
 
         precomputeGridContent();
@@ -66,8 +63,8 @@ public class Game {
     }
 
     private void initializeGrids() {
-        this.grid = new TileContent[height][width];
-        this.gridState = new TileState[height][width];
+        this.grid = new TileContent[gameMode.getGridHeight()][gameMode.getGridWidth()];
+        this.gridState = new TileState[gameMode.getGridHeight()][gameMode.getGridWidth()];
 
         // fill matrices with default values
         for (TileContent[] row : grid)
@@ -77,8 +74,8 @@ public class Game {
     }
 
     private void precomputeGridContent() {
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
+        for (int i = 0; i < gameMode.getGridHeight(); i++) {
+            for (int j = 0; j < gameMode.getGridWidth(); j++) {
                 if (grid[i][j] == TileContent.MINE)
                     continue;
 
@@ -118,8 +115,8 @@ public class Game {
 
         visitedCount = 0;
 
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
+        for (int i = 0; i < gameMode.getGridHeight(); i++)
+            for (int j = 0; j < gameMode.getGridWidth(); j++)
                 if (grid[i][j] != TileContent.MINE)
                     toVisitCount++;
     }
@@ -136,7 +133,7 @@ public class Game {
                 new Coordinate(i + 1, j),
                 new Coordinate(i + 1, j + 1)
         ).parallel().forEach(c -> {
-            if (c.x >= 0 && c.x < height && c.y >= 0 && c.y < width) {
+            if (c.x >= 0 && c.x < gameMode.getGridHeight() && c.y >= 0 && c.y < gameMode.getGridWidth()) {
                 if (grid[c.x][c.y] == TileContent.MINE)
                     near_mines.getAndIncrement();
             }
@@ -174,6 +171,7 @@ public class Game {
                 if (grid[x][y] == TileContent.MINE) {
                     gameOverFlag = true;
                     gridState[x][y] = TileState.EXPLODED;
+                    this.duration = Duration.between(startedAt, Instant.now());
                     return ActionResult.EXPLOSION;
                 }
 
@@ -183,6 +181,7 @@ public class Game {
                 // check for game over (all tiles are visited or flagged correctly)
                 if (this.toVisitCount == this.visitedCount) {
                     gameOverFlag = true;
+                    this.duration = Duration.between(startedAt, Instant.now());
                     return ActionResult.GAME_OVER;
                 }
                 return ActionResult.OK;
@@ -198,7 +197,7 @@ public class Game {
     }
 
     private void visitAndExpand(int x, int y) {
-        if (!(x >= 0 && x < this.height && y >= 0 && y < this.width))
+        if (!(x >= 0 && x < this.gameMode.getGridHeight() && y >= 0 && y < this.gameMode.getGridWidth()))
             return;
 
         if (gridState[x][y] == TileState.VISITED)
@@ -222,17 +221,17 @@ public class Game {
      * Returns the current state of the grid as a matrix of integer values representing each tile type.
      */
     public synchronized String toString() {
-        String[] output = new String[height * width];
+        String[] output = new String[gameMode.getGridHeight() * gameMode.getGridWidth()];
 
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
+        for (int i = 0; i < gameMode.getGridHeight(); i++) {
+            for (int j = 0; j < gameMode.getGridWidth(); j++) {
                 String value;
                 if (gridState[i][j] == TileState.VISITED || (gameOverFlag && gridState[i][j] != TileState.EXPLODED)) {
                     value = grid[i][j].value;
                 } else {
                     value = gridState[i][j].value;
                 }
-                output[i * width + j] = value;
+                output[i * gameMode.getGridWidth() + j] = value;
             }
         }
 
@@ -257,5 +256,17 @@ public class Game {
 
     public void removePlayer(UUID playerId) {
         connectedPlayers.remove(playerId);
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public String getStartedAt() {
+        return startedAt.toString();
+    }
+
+    public long getDuration() {
+        return duration.toMillis();
     }
 }

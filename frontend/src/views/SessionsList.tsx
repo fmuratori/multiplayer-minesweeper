@@ -47,7 +47,6 @@ function SessionsList() {
 
     browseSessionsSocket.open();
 
-
     getGameModes().then((response) => {
       if (response.status === 200) {
         setGameModes(response.data);
@@ -95,18 +94,17 @@ function SessionsList() {
       return
     }
 
-    const newSession = {
+    postNewSession({
       name: formState.sessionName,
       mode: formState.gameMode.name,
       numPlayers: formState.gameMode.numPlayers,
       numMines: formState.gameMode.numMines,
       gridWidth: formState.gameMode.gridWidth,
       gridHeight: formState.gameMode.gridHeight,
-    }
-
-    postNewSession(newSession).then((response) => {
+    }).then((response) => {
       if (response.status === 200) {
         resetForm();
+        navigate('/session', { state: {roomId: response.data.roomId, sessionName: response.data.sessionName} });
       } 
     }).catch((error) => {
       console.log(error)

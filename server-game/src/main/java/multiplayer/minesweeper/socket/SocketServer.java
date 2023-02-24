@@ -4,6 +4,8 @@ import com.corundumstudio.socketio.*;
 import multiplayer.minesweeper.game.*;
 import multiplayer.minesweeper.socket.in.ActionObject;
 import multiplayer.minesweeper.socket.in.JoinRoomObject;
+import multiplayer.minesweeper.socket.out.GameInfoObject;
+import multiplayer.minesweeper.socket.out.GameOverObject;
 import multiplayer.minesweeper.socket.out.GameUpdateObject;
 import multiplayer.minesweeper.socket.out.NewConnectionObject;
 
@@ -53,11 +55,11 @@ public class SocketServer {
             String map = game.toString();
             switch (result) {
                 case EXPLOSION:
-                    server.getRoomOperations(roomId.get()).sendEvent("game_lost", new GameUpdateObject(map));
+                    server.getRoomOperations(roomId.get()).sendEvent("game_lost", new GameOverObject(map, game.getDuration()));
                     checkAndDeleteGame(roomId.get());
                     break;
                 case GAME_OVER:
-                    server.getRoomOperations(roomId.get()).sendEvent("game_won", new GameUpdateObject(map));
+                    server.getRoomOperations(roomId.get()).sendEvent("game_won", new GameOverObject(map, game.getDuration()));
                     checkAndDeleteGame(roomId.get());
                     break;
                 case OK:
@@ -75,7 +77,7 @@ public class SocketServer {
             // TODO: reject connection if a game with the specified roomName is not found (possible frontend page refresh)
             game.addPlayer(client.getSessionId());
             String map = game.toString();
-            client.sendEvent("game_update", new GameUpdateObject(map));
+            client.sendEvent("game_info", new GameInfoObject(map, game.getGameMode(), game.getStartedAt()));
 
             // send new user connection to all connected users
             int connectedClients = server.getRoomOperations(data.getRoomName()).getClients().size();

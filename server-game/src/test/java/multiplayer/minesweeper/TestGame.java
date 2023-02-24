@@ -2,6 +2,7 @@ package multiplayer.minesweeper;
 
 
 import multiplayer.minesweeper.game.*;
+import multiplayer.minesweeper.gamemode.GameModeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ public class TestGame {
                 new Coordinate(0, 0),
                 new Coordinate(1, 1),
                 new Coordinate(2, 0));
-        gameManager = new Game(GRID_WIDTH, GRID_HEIGHT);
+        gameManager = new Game(GameModeFactory.testGrid(GRID_WIDTH, GRID_HEIGHT));
         gameManager.initialize(minesList);
     }
 

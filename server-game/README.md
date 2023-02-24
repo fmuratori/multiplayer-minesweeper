@@ -1,15 +1,24 @@
 # Multiplayer Minesweeper - Game server
 
-**API specification**
+This project contains the logic of a distributed system for a microservices oriented platform for multiplayer minesweeper game.
+Here the games instances and states are handled. 
+The main components of this project are:
+- a bidirectional socket implemented with Socket.IO
+- a basic REST API implemented with Vert.X
+- the logic for the management of many game instances
+
+# API specification
 
 [SwaggerHub](https://app.swaggerhub.com/apis/fmuratori/multiplayer-minesweeper-game-service/1.0.0)
 
 ---
 
+# Execution with gradle
+
 **To build the application**
 
 `
-./gradlew build
+gradlew build
 `
 
 **To run the application**
@@ -24,7 +33,10 @@
 ./gradlew test
 `
 
----
+# Execution with a docker container
+
+**NB**: be sure to have instantiated a user defined bridge network. For more details, check the README file inside 
+the project main folder.
 
 **Build docker image**
 
@@ -52,3 +64,7 @@ docker run \
     --name mmgame \
     mmgame
 `
+
+# Execution with docker-compose
+
+The configuration of the docker compose file is in the project main folder.

@@ -17,7 +17,8 @@ public class Main {
         Vertx vertx = Vertx.vertx();
 
         // client for the communication between this server and server-game
-        HTTPClient restClient = new HTTPClient(vertx, "172.18.0.12", 8003);
+       HTTPClient restClient = new HTTPClient(vertx, "172.18.0.12", 8003);
+        // HTTPClient restClient = new HTTPClient(vertx, "127.0.0.1", 8003);
 
         // start http server
         HTTPServer restServer = new HTTPServer(vertx, sessionsManager, 8001);

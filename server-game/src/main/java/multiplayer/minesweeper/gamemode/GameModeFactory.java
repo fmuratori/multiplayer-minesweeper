@@ -1,5 +1,7 @@
 package multiplayer.minesweeper.gamemode;
 
+import multiplayer.minesweeper.game.Coordinate;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +16,10 @@ public class GameModeFactory {
 
     public static GameMode bigGrid() {
         return new GameMode("BIG", 30, 16, 2, 90);
+    }
+
+    public static GameMode testGrid(int width, int height) {
+        return new GameMode("TEST", width, height, 0, 0);
     }
 
     public static List<GameMode> getAllGameModes() {

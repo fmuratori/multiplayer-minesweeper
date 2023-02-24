@@ -19,7 +19,7 @@ function WaitingStart() {
     });
     sessionSocket.on('game_starting', (data:any) => {
       console.log('SocketIo [SESSION] - Game starting update', data);
-      setTimeout(() => navigate('/game', { state: data }), 1000);
+      setTimeout(() => navigate('/game', { state: {roomName: data.roomName, sessionName:state.sessionName} }), 1000);
     });
     sessionSocket.on('players_count_update', (data: any) => {
       console.log('SocketIo [SESSION] - Players count update', data);

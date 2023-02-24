@@ -47,11 +47,14 @@ public class HTTPServer extends AbstractVerticle {
                 Session newSession = sessionsManager.addSession(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
                 SocketServer.get().emitSessionUpdate(newSession);
 
+                JsonObject sessionJson = new JsonObject()
+                        .put("roomId", roomId)
+                        .put("sessionName", sessionName);
                 rc.response()
                         .setStatusCode(200)
                         .putHeader("content-type",
                                 "application/json; charset=utf-8")
-                        .end();
+                        .end(sessionJson.encode());
             } catch (Exception e) {
                 rc.response()
                         .setStatusCode(400)
