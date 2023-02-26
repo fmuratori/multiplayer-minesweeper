@@ -1,6 +1,6 @@
 package multiplayer.minesweeper.socket.out;
 
-import multiplayer.minesweeper.gamemode.GameMode;
+import multiplayer.minesweeper.game.gamemode.GameMode;
 
 public class GameInfoObject extends GameUpdateObject {
 

@@ -1,6 +1,4 @@
-package multiplayer.minesweeper.gamemode;
-
-import multiplayer.minesweeper.game.Coordinate;
+package multiplayer.minesweeper.game.gamemode;
 
 import java.util.Arrays;
 import java.util.List;

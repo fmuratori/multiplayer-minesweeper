@@ -2,7 +2,7 @@ package multiplayer.minesweeper;
 
 
 import multiplayer.minesweeper.game.*;
-import multiplayer.minesweeper.gamemode.GameModeFactory;
+import multiplayer.minesweeper.game.gamemode.GameModeFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
