@@ -1,6 +1,6 @@
 package multiplayer.minesweeper.game;
 
-import multiplayer.minesweeper.game.gamemode.GameMode;
+import multiplayer.minesweeper.gameutils.GameMode;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class Game {
     private final GameMode gameMode;
 
-    private Instant startedAt;
+    private final Instant startedAt;
     private Duration duration;
     private int visitedCount = 0;
     private int toVisitCount = 0;
@@ -40,7 +40,7 @@ public class Game {
         IntStream
                 .range(0, gameMode.getNumMines())
                 .map(i -> rand.nextInt(gameMode.getGridWidth() * gameMode.getGridHeight()))
-                .mapToObj(i -> new Coordinate(i / gameMode.getGridWidth(), i % gameMode.getGridWidth()))
+                .mapToObj(i -> new Pair<Integer, Integer>(i / gameMode.getGridWidth(), i % gameMode.getGridWidth()))
                 .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
 
         precomputeGridContent();
@@ -50,7 +50,7 @@ public class Game {
      * Initializes the game and provides the configuration of mines in a game.
      * This is a testing method.
      */
-    public synchronized void initialize(List<Coordinate> mines_positions) {
+    public synchronized void initialize(List<Pair<Integer, Integer>> mines_positions) {
         initializeGrids();
 
         // add mines at random positions inside the grid
@@ -124,14 +124,14 @@ public class Game {
     private int computeNearMinesCount(int i, int j) {
         AtomicInteger near_mines = new AtomicInteger();
         Stream.of(
-                new Coordinate(i - 1, j - 1),
-                new Coordinate(i - 1, j),
-                new Coordinate(i - 1, j + 1),
-                new Coordinate(i, j - 1),
-                new Coordinate(i, j + 1),
-                new Coordinate(i + 1, j - 1),
-                new Coordinate(i + 1, j),
-                new Coordinate(i + 1, j + 1)
+                new Pair<>(i - 1, j - 1),
+                new Pair<>(i - 1, j),
+                new Pair<>(i - 1, j + 1),
+                new Pair<>(i, j - 1),
+                new Pair<>(i, j + 1),
+                new Pair<>(i + 1, j - 1),
+                new Pair<>(i + 1, j),
+                new Pair<>(i + 1, j + 1)
         ).parallel().forEach(c -> {
             if (c.x >= 0 && c.x < gameMode.getGridHeight() && c.y >= 0 && c.y < gameMode.getGridWidth()) {
                 if (grid[c.x][c.y] == TileContent.MINE)

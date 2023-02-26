@@ -1,4 +1,4 @@
-package multiplayer.minesweeper.game.gamemode;
+package multiplayer.minesweeper.gameutils;
 
 public class GameMode {
 

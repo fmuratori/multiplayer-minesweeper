@@ -2,6 +2,7 @@ package multiplayer.minesweeper.socket;
 
 import com.corundumstudio.socketio.*;
 import multiplayer.minesweeper.game.*;
+import multiplayer.minesweeper.gameutils.GamesManager;
 import multiplayer.minesweeper.socket.in.ActionObject;
 import multiplayer.minesweeper.socket.in.JoinRoomObject;
 import multiplayer.minesweeper.socket.out.GameInfoObject;

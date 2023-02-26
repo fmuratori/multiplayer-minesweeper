@@ -2,11 +2,10 @@ package multiplayer.minesweeper;
 
 import io.vertx.core.Vertx;
 import multiplayer.minesweeper.cli.CLIActions;
-import multiplayer.minesweeper.game.GamesManager;
+import multiplayer.minesweeper.gameutils.GamesManager;
 import multiplayer.minesweeper.rest.HttpServer;
 import multiplayer.minesweeper.socket.SocketServer;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Main {    

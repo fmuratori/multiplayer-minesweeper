@@ -12,9 +12,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CorsHandler;
-import multiplayer.minesweeper.game.GamesManager;
-import multiplayer.minesweeper.game.gamemode.GameMode;
-import multiplayer.minesweeper.game.gamemode.GameModeFactory;
+import multiplayer.minesweeper.gameutils.GamesManager;
+import multiplayer.minesweeper.gameutils.GameMode;
+import multiplayer.minesweeper.gameutils.GameModeFactory;
 
 public class HttpServer extends AbstractVerticle {
     private final Gson gson;

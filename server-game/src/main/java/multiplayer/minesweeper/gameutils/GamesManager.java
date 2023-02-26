@@ -1,6 +1,7 @@
-package multiplayer.minesweeper.game;
+package multiplayer.minesweeper.gameutils;
 
-import multiplayer.minesweeper.game.gamemode.GameMode;
+import multiplayer.minesweeper.game.Game;
+import multiplayer.minesweeper.gameutils.GameMode;
 
 import java.util.Map;
 import java.util.Optional;
