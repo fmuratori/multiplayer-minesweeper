@@ -2,16 +2,19 @@ version: "3.9"
 
 services:
   frontend:
+    container_name: mmfrontend
+    hostname: mmfrontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     networks:
-      compose-mmnetwork:
-        ipv4_address: 172.18.0.10
+      - compose-mmnetwork
 
   session:
+    container_name: mmsession
+    hostname: mmsession
     build:
       context: ./server-session
       dockerfile: Dockerfile
@@ -19,10 +22,11 @@ services:
       - "8001:8001"
       - "8002:8002"
     networks:
-      compose-mmnetwork:
-        ipv4_address: 172.18.0.11
+      - compose-mmnetwork
 
   game:
+    container_name: mmgame
+    hostname: mmgame
     build:
       context: ./server-game
       dockerfile: Dockerfile
@@ -30,8 +34,7 @@ services:
       - "8003:8003"
       - "8004:8004"
     networks:
-      compose-mmnetwork:
-        ipv4_address: 172.18.0.12
+      - compose-mmnetwork
 
 networks:
   compose-mmnetwork:
@@ -39,6 +42,6 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.18.0.0/24
-          gateway: 172.18.0.1
-          ip_range: 172.18.0.2/20
+        - subnet: 172.19.1.0/24
+          gateway: 172.19.1.1
+          ip_range: 172.19.1.2/20

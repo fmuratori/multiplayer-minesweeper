@@ -19,7 +19,7 @@
 **Build docker image**
 
 `
-docker build -t mmfrontend .
+docker build -t mmfrontend . --no-cache
 `
 
 
@@ -38,7 +38,7 @@ docker run \
     -it \
     --rm \
     --network mmnetwork \
+    --hostname mmfrontend \
     --name mmfrontend \
-    --ip 172.18.0.10 \
     mmfrontend
 `

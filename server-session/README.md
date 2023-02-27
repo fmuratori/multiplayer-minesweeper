@@ -29,7 +29,7 @@
 **Build docker image**
 
 `
-docker build -t mmsession .
+docker build -t mmsession . --no-cache
 `
 
 **Running docker container**
@@ -48,7 +48,7 @@ docker run \
     -it \
     --rm \
     --network mmnetwork \
+    --hostname mmsession \
     --name mmsession \
-    --ip 172.18.0.11 \
     mmsession
 `

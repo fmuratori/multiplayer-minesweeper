@@ -41,7 +41,7 @@ the project main folder.
 **Build docker image**
 
 `
-docker build -t mmgame .
+docker build -t mmgame . --no-cache
 `
 
 **Running docker container**
@@ -60,7 +60,7 @@ docker run \
     -it \
     --rm \
     --network mmnetwork \
-    --ip 172.18.0.12 \
+    --hostname mmgame \
     --name mmgame \
     mmgame
 `

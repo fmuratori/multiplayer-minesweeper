@@ -4,10 +4,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --no-package-lock
 
 COPY . ./
 
 # RUN npm run build
 
-CMD ["npx", "serve", "build"]    
+# CMD ["npx", "serve", "build"]    
+CMD ["npm", "run", "start"]    
