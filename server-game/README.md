@@ -60,10 +60,20 @@ docker run \
     -it \
     --rm \
     --network mmnetwork \
-    --hostname mmgame \
     --name mmgame \
+    --ip 172.18.0.12 \
     mmgame
 `
+
+docker run \
+    -p 8003:8003 \
+    -p 8004:8004 \
+    -it \
+    --rm \
+    --network mmnetwork \
+    --name mmgame \
+    --hostname mmgame \
+    mmgame
 
 # Execution with docker-compose
 

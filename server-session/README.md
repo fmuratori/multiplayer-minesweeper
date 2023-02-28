@@ -52,3 +52,13 @@ docker run \
     --name mmsession \
     mmsession
 `
+
+docker run \
+    -p 8001:8001 \
+    -p 8002:8002 \
+    -it \
+    --rm \
+    --network mmnetwork \
+    --name mmsession \
+    --hostname mmsession \
+    mmsession

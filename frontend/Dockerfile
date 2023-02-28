@@ -1,14 +1,10 @@
-FROM node:14.17-alpine
+FROM node:14-alpine
 
 WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install --no-package-lock
-
-COPY . ./
-
-# RUN npm run build
-
-# CMD ["npx", "serve", "build"]    
-CMD ["npm", "run", "start"]    
+COPY . .
+RUN npm install -g npm@latest
+RUN npm ci 
+RUN npm run build
+ENV NODE_ENV production
+EXPOSE 3000
+CMD [ "npx", "serve", "build" ]

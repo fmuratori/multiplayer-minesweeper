@@ -3,18 +3,18 @@ version: "3.9"
 services:
   frontend:
     container_name: mmfrontend
-    hostname: mmfrontend
+    image: mmfrontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     networks:
-      - compose-mmnetwork
+      - mmnetwork
 
   session:
     container_name: mmsession
-    hostname: mmsession
+    image: mmsession
     build:
       context: ./server-session
       dockerfile: Dockerfile
@@ -22,11 +22,11 @@ services:
       - "8001:8001"
       - "8002:8002"
     networks:
-      - compose-mmnetwork
+      - mmnetwork
 
   game:
     container_name: mmgame
-    hostname: mmgame
+    image: mmgame
     build:
       context: ./server-game
       dockerfile: Dockerfile
@@ -34,14 +34,10 @@ services:
       - "8003:8003"
       - "8004:8004"
     networks:
-      - compose-mmnetwork
+      - mmnetwork
 
 networks:
-  compose-mmnetwork:
+  mmnetwork:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.19.1.0/24
-          gateway: 172.19.1.1
-          ip_range: 172.19.1.2/20
+    driver_opts:
+      com.docker.network.bridge.name: "brmmnetwork"
