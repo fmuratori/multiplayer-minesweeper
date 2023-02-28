@@ -3,7 +3,6 @@ package multiplayer.minesweeper;
 import io.vertx.core.Vertx;
 import multiplayer.minesweeper.rest.server.HTTPServer;
 import multiplayer.minesweeper.sessions.SessionsManager;
-import multiplayer.minesweeper.cli.CLIActions;
 import multiplayer.minesweeper.rest.client.HTTPClient;
 import multiplayer.minesweeper.socket.SocketServer;
 
@@ -17,7 +16,8 @@ public class Main {
         Vertx vertx = Vertx.vertx();
 
         // client for the communication between this server and server-game
-       HTTPClient restClient = new HTTPClient(vertx, "mmgame", 8003);
+        HTTPClient restClient = new HTTPClient(vertx, "mmgame", 8003);
+        // HTTPClient restClient = new HTTPClient(vertx, "172.18.0.12", 8003);
         // HTTPClient restClient = new HTTPClient(vertx, "127.0.0.1", 8003);
 
         // start http server
@@ -25,7 +25,5 @@ public class Main {
 
         // start socket.io server
         SocketServer.get().initialize(restClient, sessionsManager, 8002);
-
-        new Thread(new CLIActions(restServer, restClient)).start();
     }
 }
