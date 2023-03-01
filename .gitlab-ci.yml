@@ -26,9 +26,9 @@ trigger:game:
     - changes:
         - server_game/*
 
-deploy-prod:
-  stage: deploy
-  needs: ["trigger:frontend", "trigger:session", "trigger:game"]
-  script:
-    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
-  environment: production
+# deploy-prod:
+#   stage: deploy
+#   needs: ["trigger:frontend", "trigger:session", "trigger:game"]
+#   script:
+#     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
+#   environment: production
