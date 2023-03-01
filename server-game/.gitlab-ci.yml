@@ -1,8 +1,10 @@
+stages:
+  - build
+  - test
+
 build:game:
   stage: build
   script:
-    - cd server-game
-    - pwd
     - gradle build
 
 test:game:

@@ -1,8 +1,10 @@
+stages:
+  - build
+  - test
+
 build:session:
   stage: build
   script:
-    - cd server-session
-    - pwd
     - gradle build
 
 test:session:
