@@ -2,13 +2,14 @@ stages:
   - build
   - test
 
-build:session:
+build:
+  image: gradle:6.9.3-jdk11-alpine
   stage: build
   script:
     - gradle build
 
-test:session:
+test:
   stage: test
-  needs: ["build:session"]
+  needs: ["build"]
   script:
     - gradle test

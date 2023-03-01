@@ -12,7 +12,7 @@ trigger:frontend:
 trigger:session:
   stage: triggers
   trigger:
-    include: server_session/.gitlab-ci.yml
+    include: server-session/.gitlab-ci.yml
   # rules:
   #   - changes:
   #       - server_session/*
@@ -20,7 +20,7 @@ trigger:session:
 trigger:game:
   stage: triggers
   trigger:
-    include: server_game/.gitlab-ci.yml
+    include: server-game/.gitlab-ci.yml
   # rules:
   #   - changes:
   #       - server_game/*

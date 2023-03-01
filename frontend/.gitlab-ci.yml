@@ -2,6 +2,9 @@ stages:
   - build
 
 build:frontend:
+  image: node:14-alpine
   stage: build
+  before_script:
+    - npm install
   script:
     - npm run build

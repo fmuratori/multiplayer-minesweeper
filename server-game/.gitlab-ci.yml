@@ -2,13 +2,14 @@ stages:
   - build
   - test
 
-build:game:
+build:
+  image: gradle:6.9.3-jdk11-alpine
   stage: build
   script:
     - gradle build
 
-test:game:
+test:
   stage: test
-  needs: ["build:game"]
+  needs: ["build"]
   script:
     - gradle test
