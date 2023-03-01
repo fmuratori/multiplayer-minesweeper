@@ -6,6 +6,7 @@ build:
   image: gradle:6.9.3-jdk11-alpine
   stage: build
   script:
+    - cd server-session
     - gradle build
 
 test:
