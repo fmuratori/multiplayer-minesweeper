@@ -5,9 +5,7 @@ build:frontend:
   image: node:14-alpine
   stage: build
   before_script:
-    - pwd
     - cd frontend
-    - pwd
     - npm install
   script:
     - npm run build

@@ -137,9 +137,9 @@ function Game() {
   }
 
   function drawTable() {
+    var map = getMapAsArray();
     if (map === null)
       return
-    var map = getMapAsArray();
     var content = [];
     for (var i = 0; i < gameData.gridHeight; i++) {
       content.push(

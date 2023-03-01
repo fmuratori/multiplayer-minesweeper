@@ -40,6 +40,7 @@ function WaitingStart() {
       sessionSocket.off('session_error');
       sessionSocket.close();
     };
+  // eslint-disable-next-line
   }, [])
 
   function exitSession(e:any) {
