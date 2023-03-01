@@ -1,0 +1,12 @@
+build:game:
+  stage: build
+  script:
+    - cd server-game
+    - pwd
+    - gradle build
+
+test:game:
+  stage: test
+  needs: ["build:game"]
+  script:
+    - gradle test

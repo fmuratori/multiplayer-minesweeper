@@ -1,0 +1,11 @@
+include:
+  - local: frontend\.gitlab-ci.yml
+  - local: server-session\.gitlab-ci.yml
+  - local: server-game\.gitlab-ci.yml
+
+deploy-prod:
+  stage: deploy
+  needs: ["build:frontend", "test:session", "test:game"]
+  script:
+    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
+  environment: production

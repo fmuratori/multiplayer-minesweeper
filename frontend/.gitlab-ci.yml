@@ -1,0 +1,6 @@
+build:frontend:
+  stage: build
+  script:
+    - cd frontend
+    - pwd
+    - npm run build

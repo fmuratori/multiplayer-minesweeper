@@ -1,0 +1,12 @@
+build:session:
+  stage: build
+  script:
+    - cd server-session
+    - pwd
+    - gradle build
+
+test:session:
+  stage: test
+  needs: ["build:session"]
+  script:
+    - gradle test
