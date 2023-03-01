@@ -13,4 +13,4 @@ test:
   stage: test
   needs: ["build"]
   script:
-    - gradle test
+    - gradle check
