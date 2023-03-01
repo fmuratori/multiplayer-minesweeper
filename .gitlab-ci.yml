@@ -1,6 +1,5 @@
 stages:
   - triggers
-  - deploy
 
 trigger:frontend:
   stage: triggers
