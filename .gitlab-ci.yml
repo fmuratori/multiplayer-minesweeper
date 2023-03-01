@@ -5,25 +5,25 @@ trigger:frontend:
   stage: triggers
   trigger:
     include: frontend/.gitlab-ci.yml
-  rules:
-    - changes:
-        - frontend/*
+  # rules:
+  #   - changes:
+  #       - frontend/*
 
 trigger:session:
   stage: triggers
   trigger:
     include: server_session/.gitlab-ci.yml
-  rules:
-    - changes:
-        - server_session/*
+  # rules:
+  #   - changes:
+  #       - server_session/*
 
 trigger:game:
   stage: triggers
   trigger:
     include: server_game/.gitlab-ci.yml
-  rules:
-    - changes:
-        - server_game/*
+  # rules:
+  #   - changes:
+  #       - server_game/*
 
 # deploy-prod:
 #   stage: deploy
