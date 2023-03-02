@@ -7,7 +7,7 @@ trigger:frontend:
   trigger:
     include:
       - artifact: frontend/.gitlab-ci.yml
-        job: generate-ci
+        job: trigger:frontend
     strategy: depend
   # rules:
   #   - changes:
@@ -18,7 +18,7 @@ trigger:session:
   trigger:
     include:
       - artifact: server-session/.gitlab-ci.yml
-        job: generate-ci
+        job: trigger:session
     strategy: depend
   # rules:
   #   - changes:
@@ -29,7 +29,7 @@ trigger:game:
   trigger:
     include:
       - artifact: server-game/.gitlab-ci.yml
-        job: generate-ci
+        job: trigger:game
     strategy: depend
   # rules:
   #   - changes:
