@@ -36,7 +36,7 @@ deploy-prod:
   stage: deploy
   needs: ["trigger:frontend", "trigger:session", "trigger:game"]
   script:
-    - echo "Test delivery"
+    - echo "Successful delivery to master branch"
   rules:
       - if: '$CI_COMMIT_BRANCH == "master"'
 #   environment: production
