@@ -5,9 +5,7 @@ stages:
 trigger:frontend:
   stage: triggers
   trigger:
-    include:
-      - artifact: frontend/.gitlab-ci.yml
-        job: trigger:frontend
+    include: frontend/.gitlab-ci.yml
     strategy: depend
   # rules:
   #   - changes:
@@ -16,9 +14,7 @@ trigger:frontend:
 trigger:session:
   stage: triggers
   trigger:
-    include:
-      - artifact: server-session/.gitlab-ci.yml
-        job: trigger:session
+    include: server-session/.gitlab-ci.yml
     strategy: depend
   # rules:
   #   - changes:
@@ -27,9 +23,7 @@ trigger:session:
 trigger:game:
   stage: triggers
   trigger:
-    include:
-      - artifact: server-game/.gitlab-ci.yml
-        job: trigger:game
+    include: server-game/.gitlab-ci.yml
     strategy: depend
   # rules:
   #   - changes:
