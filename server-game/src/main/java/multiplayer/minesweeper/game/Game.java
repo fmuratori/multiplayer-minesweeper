@@ -21,6 +21,7 @@ public class Game {
     private TileState[][] gridState;
 
     private boolean gameOverFlag = false;
+    private boolean gameLostFlag = false;
     private boolean firstActionFlag = true;
     private final Set<UUID> connectedPlayers = new HashSet<>();
 
@@ -172,6 +173,7 @@ public class Game {
                     gameOverFlag = true;
                     gridState[x][y] = TileState.EXPLODED;
                     this.duration = Duration.between(startedAt, Instant.now());
+                    this.gameLostFlag = true;
                     return ActionResult.EXPLOSION;
                 }
 
@@ -238,35 +240,42 @@ public class Game {
         return String.join(" ", output);
     }
 
-    public TileContent[][] getGrid() {
+    public synchronized TileContent[][] getGrid() {
         return grid;
     }
 
-    public TileState[][] getGridState() {
+    public synchronized TileState[][] getGridState() {
         return gridState;
     }
 
-    public void addPlayer(UUID newPlayerId) {
+    public synchronized void addPlayer(UUID newPlayerId) {
         connectedPlayers.add(newPlayerId);
     }
 
-    public boolean containsPlayer(UUID playerId) {
+    public synchronized boolean containsPlayer(UUID playerId) {
         return connectedPlayers.contains(playerId);
     }
 
-    public void removePlayer(UUID playerId) {
+    public synchronized void removePlayer(UUID playerId) {
         connectedPlayers.remove(playerId);
     }
 
-    public GameMode getGameMode() {
+    public synchronized GameMode getGameMode() {
         return gameMode;
     }
 
-    public String getStartedAt() {
+    public synchronized String getStartedAt() {
         return startedAt.toString();
     }
 
-    public long getDuration() {
+    public synchronized long getDuration() {
         return duration.toMillis();
+    }
+
+    public synchronized boolean isOver() {
+        return gameOverFlag;
+    }
+    public synchronized boolean isLost() {
+        return gameLostFlag;
     }
 }

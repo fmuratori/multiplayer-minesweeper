@@ -1,6 +1,11 @@
 package multiplayer.minesweeper.socket;
 
 import com.corundumstudio.socketio.*;
+import multiplayer.minesweeper.observer.Observers;
+import multiplayer.minesweeper.observer.events.ConnectionEvent;
+import multiplayer.minesweeper.observer.events.DisconnectionEvent;
+import multiplayer.minesweeper.observer.events.JoinSessionEvent;
+import multiplayer.minesweeper.observer.events.LeaveSessionEvent;
 import multiplayer.minesweeper.rest.client.HTTPClient;
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.sessions.SessionsManager;
@@ -18,16 +23,14 @@ public class SocketServer {
     private SocketIONamespace sessionNamespace;
     private HTTPClient gameServerClient;
 
-    private SocketServer() {
-
-    }
+    private SocketServer() {}
 
     public static SocketServer get() {
         return instance;
     }
 
-    public void initialize(HTTPClient restClient, SessionsManager manager, int port) {
-        this.gameServerClient = restClient;
+    public void initialize(SessionsManager manager, int port) {
+        this.gameServerClient = HTTPClient.get();
         this.sessionsManager = manager;
 
         Configuration config = new Configuration();
@@ -37,60 +40,69 @@ public class SocketServer {
 
         sessionNamespace = server.addNamespace("/session");
         sessionNamespace.addConnectListener((client) -> {
-            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Connected to namespace /session");
+            Observers.get().notifyAll(new ConnectionEvent("session", client.getSessionId().toString()));
+//            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Connected to namespace /session");
         });
         sessionNamespace.addDisconnectListener(client -> {
-            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Disconnected from namespace /session");
+            Observers.get().notifyAll(new DisconnectionEvent("session", client.getSessionId().toString()));
+//            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Disconnected from namespace /session");
         });
         sessionNamespace.addEventListener("join_room", JoinRoomObject.class, (client, data, ackSender) -> {
-            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
-
             String roomName = data.getRoomName();
-            Optional<Session> session = sessionsManager.getSession(roomName);
-            if (session.isEmpty()) {
-                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session not found"));
-            } else if (session.get().isFull()) {
-                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session is full"));
-            } else {
-                session.get().addConnectedUsers();
+            int connectedClients = sessionNamespace.getRoomOperations(roomName).getClients().size();
+            Observers.get().notifyAll(
+                    new JoinSessionEvent(roomName, connectedClients, client));
 
-                // add user to one game sessione
-                client.joinRoom(roomName);
-
-                // send new user connection to all connected users
-                int connectedClients = sessionNamespace.getRoomOperations(roomName).getClients().size();
-                sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getNumPlayers()));
-
-                if (connectedClients == session.get().getNumPlayers()) {
-                    System.out.println("[Socket.IO] - Starting game for room " + roomName);
-
-                    gameServerClient.sendGameRequest(roomName, session.get());
-
-                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session.get(), SessionUpdateType.GAME_STARTING));
-                } else {
-                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session.get(), SessionUpdateType.ADDED_USER));
-                }
-            }
+//            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
+//            Optional<Session> session = sessionsManager.getSession(roomName);
+//            if (session.isEmpty()) {
+//                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session not found"));
+//            } else if (session.get().isFull()) {
+//                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session is full"));
+//            } else {
+//                session.get().addConnectedUsers();
+//
+//                // add user to one game sessione
+//                client.joinRoom(roomName);
+//
+//                // send new user connection to all connected users
+//                sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getNumPlayers()));
+//
+//                if (connectedClients == session.get().getNumPlayers()) {
+//                    System.out.println("[Socket.IO] - Starting game for room " + roomName);
+//
+//                    gameServerClient.sendGameRequest(roomName, session.get());
+//
+//                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session.get(), SessionUpdateType.GAME_STARTING));
+//                } else {
+//                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session.get(), SessionUpdateType.ADDED_USER));
+//                }
+//            }
         });
         sessionNamespace.addEventListener("leave_room", LeaveRoomObject.class, (client, data, ackSender) -> {
-            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
-
             String roomName = data.getRoomName();
-            Optional<Session> session = sessionsManager.getSession(roomName);
-            if (session.isEmpty()) {
-                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session not found"));
-            } else if (session.get().isEmpty()) {
-                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session is empty"));
-            } else {
-                client.leaveRoom(roomName);
+            int connectedClients = sessionNamespace.getRoomOperations(roomName).getClients().size();
+            Observers.get().notifyAll(
+                    new LeaveSessionEvent(roomName, connectedClients, client));
 
-                session.get().removeConnectedUsers();
-
-                // send new user connection to all connected users
-                int connectedClients = server.getRoomOperations(roomName).getClients().size();
-                server.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getNumPlayers()));
-                browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session.get(), SessionUpdateType.REMOVED_USER));
-            }
+//            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
+//
+//            String roomName = data.getRoomName();
+//            Optional<Session> session = sessionsManager.getSession(roomName);
+//            if (session.isEmpty()) {
+//                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session not found"));
+//            } else if (session.get().isEmpty()) {
+//                sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session is empty"));
+//            } else {
+//                client.leaveRoom(roomName);
+//
+//                session.get().removeConnectedUsers();
+//
+//                // send new user connection to all connected users
+//                int connectedClients = server.getRoomOperations(roomName).getClients().size();
+//                server.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.get().getNumPlayers()));
+//                browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session.get(), SessionUpdateType.REMOVED_USER));
+//            }
         });
 
         browseNamespace = server.addNamespace("/browse");
@@ -107,9 +119,17 @@ public class SocketServer {
         System.out.println("[Socket.IO] - SocketIO server started on port " + port);
     }
 
-    public void close() {
-        System.out.println("[Socket.IO] - Terminating Socket.IO server");
-        server.stop();
+    public void joinRoom(String roomName, SocketIOClient client, PlayersCountObject object) {
+        client.joinRoom(roomName);
+        sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", object));
+    }
+
+    public void sendSessionUpdate(SessionUpdateObject object) {
+        browseNamespace.getBroadcastOperations().sendEvent("session_update", object);
+    }
+
+    public void sendSessionError(SessionError object) {
+        browseNamespace.getBroadcastOperations().sendEvent("session_error", object);
     }
 
     public void gameStartingResponse(String sessionRoomName, String gameRoomName) {

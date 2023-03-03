@@ -87,9 +87,4 @@ public class HTTPServer extends AbstractVerticle {
                         )
                 );
     }
-
-    public void close() {
-        System.out.println("[HTTP Server] - Terminating Vert.X http server");
-        vertx.close();
-    }
 }

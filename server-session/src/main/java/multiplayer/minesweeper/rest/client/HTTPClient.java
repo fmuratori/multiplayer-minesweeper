@@ -8,11 +8,12 @@ import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.socket.SocketServer;
 
 public class HTTPClient {
+    private static HTTPClient instance;
     private final WebClient client;
     private final int serverPort;
     private final String serverHost;
 
-    public HTTPClient(Vertx vertx, String serverHost, int serverPort) {
+    private HTTPClient(Vertx vertx, String serverHost, int serverPort) {
         WebClientOptions options = new WebClientOptions();
         client = WebClient.create(vertx, options);
         this.serverPort = serverPort;
@@ -36,5 +37,13 @@ public class HTTPClient {
                     SocketServer.get().gameStartingResponse(sessionRoomName, null);
                     System.out.println("[HTTP Client] - Unable to connect with the server. Error: " + err.getMessage());
                 });
+    }
+
+    public static void newInstance(Vertx vertx, String serverHost, int serverPort) {
+        instance = new HTTPClient(vertx, serverHost, serverPort);
+    }
+
+    public static HTTPClient get() {
+        return instance;
     }
 }

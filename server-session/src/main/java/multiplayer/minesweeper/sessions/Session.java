@@ -26,15 +26,18 @@ public class Session {
     }
 
     public synchronized void addConnectedUsers() {
-
-        numConnectedUsers++;
-        if (numConnectedUsers == numPlayers) isFullFlag = true;
+        if (!isFull()) {
+            numConnectedUsers++;
+            if (numConnectedUsers == numPlayers) isFullFlag = true;
+        }
     }
 
     public synchronized void removeConnectedUsers() {
-        numConnectedUsers--;
+        if (!isEmpty()) {
+            numConnectedUsers--;
 
-        if (numConnectedUsers < numPlayers) isFullFlag = false;
+            if (numConnectedUsers < numPlayers) isFullFlag = false;
+        }
     }
 
     public String getRoomId() {
