@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestGame {
+public class TestGameCore {
 
     private Game gameManager = null;
     private final int GRID_WIDTH = 4;
