@@ -48,7 +48,7 @@ public class TestSession {
         session.addConnectedUsers();
         assertTrue(session.isFull());
 
-        assertEquals(session.getNumConnectedUsers(), NUM_PLAYERS);
+        assertEquals(NUM_PLAYERS, session.getNumConnectedUsers());
     }
     @Test
     public void testUsersDisconnectionUnderLimit() {

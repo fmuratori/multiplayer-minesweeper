@@ -12,8 +12,6 @@ public class Session {
     private final int gridHeight;
     private int numConnectedUsers;
 
-    private boolean isFullFlag = false;
-
     public Session(String roomId, String sessionName, String gameMode, int numPlayers, int gridWidth, int gridHeight) {
         this.roomId = roomId;
         this.sessionName = sessionName;
@@ -26,15 +24,11 @@ public class Session {
     }
 
     public synchronized void addConnectedUsers() {
-
-        numConnectedUsers++;
-        if (numConnectedUsers == numPlayers) isFullFlag = true;
+        if (!isFull()) numConnectedUsers++;
     }
 
     public synchronized void removeConnectedUsers() {
-        numConnectedUsers--;
-
-        if (numConnectedUsers < numPlayers) isFullFlag = false;
+        if (!isEmpty()) numConnectedUsers--;
     }
 
     public String getRoomId() {
@@ -70,11 +64,10 @@ public class Session {
     }
 
     public synchronized boolean isFull() {
-        return isFullFlag;
+        return numConnectedUsers == numPlayers;
     }
 
     public synchronized boolean isEmpty() {
         return numConnectedUsers == 0;
     }
-
 }

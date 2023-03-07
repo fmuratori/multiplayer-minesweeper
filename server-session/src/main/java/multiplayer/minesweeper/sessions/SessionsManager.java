@@ -4,10 +4,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SessionsManager {
+    private static final SessionsManager instance = new SessionsManager();
+    public static SessionsManager get() {return instance;}
     private final Map<String, Session> sessions = new HashMap<>();
 
-    public SessionsManager() {
-    }
+    private SessionsManager() {}
 
     public Optional<Session> getSession(String roomId) {
         if (!sessions.containsKey(roomId))
@@ -26,11 +27,11 @@ public class SessionsManager {
         sessions.remove(roomId);
     }
 
-    public List<Session> getSessionsByMode(String mode) {
+    public List<Session> getOpenSessionsByMode(String mode) {
         return sessions
                 .values()
                 .stream()
-                .filter(s -> s.getGameMode() == mode)
+                .filter(s -> Objects.equals(s.getGameMode(), mode) && !s.isFull())
                 .collect(Collectors.toList());
     }
 
