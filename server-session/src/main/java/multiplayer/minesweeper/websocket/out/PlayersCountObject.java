@@ -5,7 +5,8 @@ public class PlayersCountObject {
     private int connectedCount;
     private int maxPlayersCount;
 
-    public PlayersCountObject() {}
+    public PlayersCountObject() {
+    }
 
     public PlayersCountObject(int count, int maxCount) {
         super();
@@ -17,5 +18,7 @@ public class PlayersCountObject {
         return connectedCount;
     }
 
-    public int getMaxPlayersCount() { return maxPlayersCount; }
+    public int getMaxPlayersCount() {
+        return maxPlayersCount;
+    }
 }

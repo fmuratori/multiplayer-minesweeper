@@ -8,7 +8,10 @@ public enum SessionUpdateType {
 
     private final String value;
 
-    SessionUpdateType(String value) {this.value = value;};
+    SessionUpdateType(String value) {
+        this.value = value;
+    }
+
     public String getValue() {
         return value;
     }

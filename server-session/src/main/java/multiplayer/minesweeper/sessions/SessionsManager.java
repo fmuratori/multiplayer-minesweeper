@@ -4,11 +4,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SessionsManager {
-    private static final SessionsManager instance = new SessionsManager();
-    public static SessionsManager get() {return instance;}
     private final Map<String, Session> sessions = new HashMap<>();
 
-    private SessionsManager() {}
+    public SessionsManager() {
+    }
 
     public Optional<Session> getSession(String roomId) {
         if (!sessions.containsKey(roomId))
@@ -17,8 +16,8 @@ public class SessionsManager {
             return Optional.of(sessions.get(roomId));
     }
 
-    public Session addSession(String roomId, String sessionName, String mode, int numPlayers, int gridWidth, int  gridHeight) {
-        Session newSession = new Session(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
+    public Session addSession(String roomId, String sessionName, String mode, int numPlayers, int gridWidth, int gridHeight) {
+        var newSession = new Session(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
         sessions.put(roomId, newSession);
         return newSession;
     }

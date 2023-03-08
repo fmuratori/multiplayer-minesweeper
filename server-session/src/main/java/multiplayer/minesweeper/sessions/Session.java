@@ -31,28 +31,8 @@ public class Session {
         if (!isEmpty()) numConnectedUsers--;
     }
 
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public String getSessionName() {
-        return sessionName;
-    }
-
     public int getNumPlayers() {
         return numPlayers;
-    }
-
-    public int getGridWidth() {
-        return gridWidth;
-    }
-
-    public int getGridHeight() {
-        return gridHeight;
     }
 
     public String getGameMode() {

@@ -6,7 +6,8 @@ public class SessionUpdateObject {
     private Session session;
     private SessionUpdateType updateType;
 
-    public SessionUpdateObject() {}
+    public SessionUpdateObject() {
+    }
 
     public SessionUpdateObject(Session session, SessionUpdateType updateType) {
         this.session = session;
