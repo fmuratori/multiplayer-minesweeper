@@ -59,6 +59,8 @@ public class Controller {
 
             if (numPlayers > 1)
                 socketServer.emitSessionUpdate(newSession);
+
+            result.complete(roomId);
         });
         return result;
     }

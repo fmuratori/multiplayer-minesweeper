@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSession {
-    private Session session;
     private final int NUM_PLAYERS = 2;
+    private Session session;
 
     @BeforeEach
     void initialize() {
@@ -30,6 +30,7 @@ public class TestSession {
 
         assertTrue(session.isFull());
     }
+
     @Test
     public void testUsersDisconnection() {
         session.addConnectedUsers();
@@ -38,6 +39,7 @@ public class TestSession {
         assertFalse(session.isFull());
         assertTrue(session.isEmpty());
     }
+
     @Test
     public void testUsersConnectionOverLimit() {
         session.addConnectedUsers();
@@ -51,6 +53,7 @@ public class TestSession {
         assertEquals(NUM_PLAYERS,
                 session.getNumConnectedUsers());
     }
+
     @Test
     public void testUsersDisconnectionUnderLimit() {
         session.removeConnectedUsers();

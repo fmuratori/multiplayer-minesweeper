@@ -2,19 +2,20 @@ package multiplayer;
 
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.sessions.SessionsManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestSessionsManager {
     private SessionsManager manager;
-    
+
     @BeforeEach
     void initialize() {
         manager = new SessionsManager();
     }
-    
+
     @Test
     void testAddSession() {
         assertTrue(manager.getOpenSessions().isEmpty());
@@ -25,10 +26,12 @@ public class TestSessionsManager {
 
         try {
             manager.addSession("test", "test", "mode1", 2, 4, 4);
-        } catch (IllegalArgumentException ignored){}
+        } catch (IllegalArgumentException ignored) {
+        }
 
         assertEquals(manager.getOpenSessions().size(), 1);
     }
+
     @Test
     void testRemoveSession() {
         manager.addSession("test", "test", "mode1", 2, 4, 4);
@@ -56,6 +59,7 @@ public class TestSessionsManager {
         s1.addConnectedUsers();
         assertEquals(manager.getOpenSessions().size(), 0);
     }
+
     @Test
     void testGetSessionByMode() {
         Session s1 = manager.addSession("test", "test", "mode1", 2, 4, 4);

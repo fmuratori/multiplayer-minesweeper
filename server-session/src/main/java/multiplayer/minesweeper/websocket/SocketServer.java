@@ -40,7 +40,7 @@ public class SocketServer {
 
         sessionNamespace.addEventListener("join_room", JoinRoomObject.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
-            this.handleJoinRoomRequest(client, data);
+            handleJoinRoomRequest(client, data);
         });
 
         sessionNamespace.addEventListener("leave_room", LeaveRoomObject.class, (client, data, ackSender) -> {
@@ -91,10 +91,10 @@ public class SocketServer {
         String roomName = data.getRoomName();
 
         controller.handleJoinSession(roomName).thenApply((Map<String, Object> object) -> {
-            String status = (String) object.get("status");
+            var status = (String) object.get("status");
             Session session = null;
-            int numMaxPlayers = 0;
-            int numConnectedClients = 0;
+            var numMaxPlayers = 0;
+            var numConnectedClients = 0;
             if (object.containsKey("session")) {
                 session = (Session) object.get("session");
                 numMaxPlayers = session.getNumPlayers();
