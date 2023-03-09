@@ -39,15 +39,6 @@ docker run \
     --rm \
     --network mmnetwork \
     --hostname mmfrontend \
-    --name mmfrontend \
     mmfrontend
 `
-
-docker run \
-    -p 3000:3000 \
-    -it \
-    --rm \
-    --network mmnetwork \
     --name mmfrontend \
-    --hostname mmfrontend \
-    mmfrontend

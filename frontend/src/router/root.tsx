@@ -13,10 +13,6 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/sessions",
-        element: <SessionsList />,
-      },
-      {
         path: "/",
         element: <SessionsList />,
       },

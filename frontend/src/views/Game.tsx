@@ -28,7 +28,7 @@ function Game() {
       console.log('SocketIo [GAME] - Disconnect from server-game');
       
       // show disconnection message and redirect to home button
-      setTimeout(() => navigate('/sessions'), 5000);
+      setTimeout(() => navigate('/'), 5000);
     });
     gameSocket.on('players_count_update', (data: {connectedCount: number}) => {
       console.log('players_count_update', data);
@@ -48,7 +48,7 @@ function Game() {
       });
 
       // show won game message and redirect to home button
-      setTimeout(() => navigate('/sessions'), 5000);
+      setTimeout(() => navigate('/'), 5000);
     });
     gameSocket.on('game_lost', (data: { map: string, duration: string }) => {
       console.log('game_lost', data);
@@ -64,7 +64,7 @@ function Game() {
       });
 
       // show lost game message and redirect to home button
-      setTimeout(() => navigate('/sessions'), 5000);
+      setTimeout(() => navigate('/'), 5000);
     });
     gameSocket.on('game_update', (data: { map: string }) => {
       console.log('game_update', data['map'], gameData);
@@ -133,7 +133,7 @@ function Game() {
   function disconnect(e:React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     gameSocket.close();
-    navigate('/sessions');
+    navigate('/');
   }
 
   function drawTable() {

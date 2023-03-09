@@ -49,7 +49,7 @@ function SessionsList() {
 
     getGameModes().then((response) => {
       if (response.status === 200) {
-        setGameModes(response.data);
+        setGameModes(response.data["game_modes"]);
       } 
     }).catch((error) => {
       console.log(error)
