@@ -26,7 +26,6 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:29.0-jre")
-    implementation("com.google.code.gson:gson:2.10")
 
     implementation("io.vertx:vertx-core:4.3.4")
     implementation("io.vertx:vertx-web:4.3.4")

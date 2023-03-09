@@ -26,10 +26,12 @@ public class GamesManager {
         activeGames.remove(roomId);
     }
 
-    public Game getGameInstance(String roomId) {
-        if (!activeGames.containsKey(roomId))
-            throw new IllegalArgumentException();
-        return activeGames.get(roomId);
+    public Optional<Game> getGameInstance(String roomId) {
+        if (activeGames.containsKey(roomId))
+            return Optional.of(activeGames.get(roomId));
+        else
+            return Optional.empty();
+
     }
 
     public Optional<String> findGameByUser(UUID playerId) {

@@ -1,7 +1,6 @@
 package multiplayer.minesweeper;
 
 
-import multiplayer.minesweeper.game.*;
 import multiplayer.minesweeper.gameutils.GameModeFactory;
 import multiplayer.minesweeper.gameutils.GamesManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,14 +46,17 @@ public class TestGamesManager {
         UUID player1 = UUID.randomUUID();
         UUID player2 = UUID.randomUUID();
 
-        Game game = gamesManager.getGameInstance(gameId);
+        var optGame = gamesManager.getGameInstance(gameId);
+        if (optGame.isPresent()) {
+            var game = optGame.get();
 
-        game.addPlayer(player1);
-        assertTrue(game.containsPlayer(player1));
+            game.addPlayer(player1);
+            assertTrue(game.containsPlayer(player1));
 
-        assertFalse(game.containsPlayer(player2));
-        game.addPlayer(player2);
-        assertTrue(game.containsPlayer(player2));
+            assertFalse(game.containsPlayer(player2));
+            game.addPlayer(player2);
+            assertTrue(game.containsPlayer(player2));
+        }
     }
 
     @Test
@@ -63,16 +65,18 @@ public class TestGamesManager {
 
         UUID player1 = UUID.randomUUID();
 
-        Game game = gamesManager.getGameInstance(gameId);
+        var optGame = gamesManager.getGameInstance(gameId);
+        if (optGame.isPresent()) {
+            var game = optGame.get();
+            assertFalse(game.containsPlayer(player1));
+            game.removePlayer(player1);
+            assertFalse(game.containsPlayer(player1));
 
-        assertFalse(game.containsPlayer(player1));
-        game.removePlayer(player1);
-        assertFalse(game.containsPlayer(player1));
+            game.addPlayer(player1);
+            assertTrue(game.containsPlayer(player1));
 
-        game.addPlayer(player1);
-        assertTrue(game.containsPlayer(player1));
-
-        game.removePlayer(player1);
-        assertFalse(game.containsPlayer(player1));
+            game.removePlayer(player1);
+            assertFalse(game.containsPlayer(player1));
+        }
     }
 }

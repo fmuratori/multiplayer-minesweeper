@@ -1,4 +1,4 @@
-package multiplayer.minesweeper.socket.in;
+package multiplayer.minesweeper.websocket.in;
 
 public class JoinRoomObject {
 

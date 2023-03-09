@@ -1,4 +1,4 @@
-package multiplayer.minesweeper.socket.out;
+package multiplayer.minesweeper.websocket.out;
 
 public class GameOverObject extends GameUpdateObject {
     private long duration;

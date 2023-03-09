@@ -21,6 +21,7 @@ public class Game {
     private TileState[][] gridState;
 
     private boolean gameOverFlag = false;
+    private boolean gameLostFlag = false;
     private boolean firstActionFlag = true;
     private final Set<UUID> connectedPlayers = new HashSet<>();
 
@@ -161,7 +162,15 @@ public class Game {
                 // always allow the first action
                 if (firstActionFlag) {
                     if (grid[x][y] == TileContent.MINE) {
+
+                        Pair<Integer, Integer> point = findEmptyTile();
+                        if (point != null)
+                            grid[point.x][point.y] = TileContent.MINE;
+
+                        //move the mine somewhere else
                         grid[x][y] = TileContent.EMPTY;
+
+                        // update the precomputed grid
                         precomputeGridContent();
                     }
                     firstActionFlag = false;
@@ -171,7 +180,8 @@ public class Game {
                 if (grid[x][y] == TileContent.MINE) {
                     gameOverFlag = true;
                     gridState[x][y] = TileState.EXPLODED;
-                    this.duration = Duration.between(startedAt, Instant.now());
+                    duration = Duration.between(startedAt, Instant.now());
+                    gameLostFlag = true;
                     return ActionResult.EXPLOSION;
                 }
 
@@ -181,7 +191,7 @@ public class Game {
                 // check for game over (all tiles are visited or flagged correctly)
                 if (this.toVisitCount == this.visitedCount) {
                     gameOverFlag = true;
-                    this.duration = Duration.between(startedAt, Instant.now());
+                    duration = Duration.between(startedAt, Instant.now());
                     return ActionResult.GAME_OVER;
                 }
                 return ActionResult.OK;
@@ -194,6 +204,17 @@ public class Game {
             default:
                 return ActionResult.IGNORED;
         }
+    }
+
+    private Pair<Integer, Integer> findEmptyTile() {
+        for (int i = 0; i < gameMode.getGridHeight(); i++) {
+            for (int j = 0; j < gameMode.getGridWidth(); j++) {
+                if (grid[i][j] == TileContent.EMPTY) {
+                    return new Pair<>(i, j);
+                }
+            }
+        }
+        return null;
     }
 
     private void visitAndExpand(int x, int y) {
@@ -258,6 +279,10 @@ public class Game {
         connectedPlayers.remove(playerId);
     }
 
+    public int getConnectedPlayersCount() {
+        return connectedPlayers.size();
+    }
+
     public GameMode getGameMode() {
         return gameMode;
     }
@@ -268,5 +293,13 @@ public class Game {
 
     public long getDuration() {
         return duration.toMillis();
+    }
+
+    public boolean isOver() {
+        return gameOverFlag;
+    }
+
+    public boolean isLost() {
+        return gameLostFlag;
     }
 }

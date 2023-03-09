@@ -118,6 +118,11 @@ public class TestGameConcurrent {
             // remove error action
             actions.remove(errorAction);
 
+            System.out.println(Arrays.deepToString(game.getGridState()));
+            System.out.println(Arrays.deepToString(game.getGrid()));
+            System.out.println(game.isOver());
+            System.out.println(game.isLost());
+
             // check assertion
             assertTrue(game.isOver());
             assertTrue(game.isLost());
