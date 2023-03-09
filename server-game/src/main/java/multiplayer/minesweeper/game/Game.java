@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 public class Game {
     private final GameMode gameMode;
-
     private final Instant startedAt;
     private Duration duration;
     private int visitedCount = 0;
@@ -65,11 +64,10 @@ public class Game {
 
     private void initializeGrids() {
         this.grid = new TileContent[gameMode.getGridHeight()][gameMode.getGridWidth()];
-        this.gridState = new TileState[gameMode.getGridHeight()][gameMode.getGridWidth()];
-
-        // fill matrices with default values
         for (TileContent[] row : grid)
             Arrays.fill(row, TileContent.EMPTY);
+
+        this.gridState = new TileState[gameMode.getGridHeight()][gameMode.getGridWidth()];
         for (TileState[] row : gridState)
             Arrays.fill(row, TileState.NOT_VISITED);
     }
@@ -115,7 +113,6 @@ public class Game {
         }
 
         visitedCount = 0;
-
         for (int i = 0; i < gameMode.getGridHeight(); i++)
             for (int j = 0; j < gameMode.getGridWidth(); j++)
                 if (grid[i][j] != TileContent.MINE)
@@ -162,10 +159,10 @@ public class Game {
                 // always allow the first action
                 if (firstActionFlag) {
                     if (grid[x][y] == TileContent.MINE) {
-
                         Pair<Integer, Integer> point = findEmptyTile();
-                        if (point != null)
+                        if (point != null) {
                             grid[point.x][point.y] = TileContent.MINE;
+                        }
 
                         //move the mine somewhere else
                         grid[x][y] = TileContent.EMPTY;
@@ -179,9 +176,9 @@ public class Game {
                 // game lost
                 if (grid[x][y] == TileContent.MINE) {
                     gameOverFlag = true;
+                    gameLostFlag = true;
                     gridState[x][y] = TileState.EXPLODED;
                     duration = Duration.between(startedAt, Instant.now());
-                    gameLostFlag = true;
                     return ActionResult.EXPLOSION;
                 }
 
@@ -209,7 +206,7 @@ public class Game {
     private Pair<Integer, Integer> findEmptyTile() {
         for (int i = 0; i < gameMode.getGridHeight(); i++) {
             for (int j = 0; j < gameMode.getGridWidth(); j++) {
-                if (grid[i][j] == TileContent.EMPTY) {
+                if (grid[i][j] != TileContent.MINE) {
                     return new Pair<>(i, j);
                 }
             }
@@ -257,6 +254,17 @@ public class Game {
         }
 
         return String.join(" ", output);
+    }
+
+    public void resetGame() {
+        gameLostFlag = false;
+        gameOverFlag = false;
+        firstActionFlag = true;
+        visitedCount = 0;
+
+        gridState = new TileState[gameMode.getGridHeight()][gameMode.getGridWidth()];
+        for (TileState[] row : gridState)
+            Arrays.fill(row, TileState.NOT_VISITED);
     }
 
     public TileContent[][] getGrid() {

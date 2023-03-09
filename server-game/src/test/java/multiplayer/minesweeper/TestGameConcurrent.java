@@ -11,7 +11,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestGameConcurrent {
-    private final int CONCURRENT_CHECKS = 10;
+    private final int NUM_CHECKS = 10;
     private Game game = null;
 
     private final List<Pair<Integer, Integer>> minesList = List.of(
@@ -50,7 +50,7 @@ public class TestGameConcurrent {
 
     @Test
     void testConcurrent() throws InterruptedException {
-        for (int i = 0; i < CONCURRENT_CHECKS; i++) {
+        for (int i = 0; i < NUM_CHECKS; i++) {
             Collections.shuffle(actions);
             List<Pair<Integer, Integer>> player1Actions = actions.subList(0, actions.size() / 2);
             List<Pair<Integer, Integer>> player2Actions = actions.subList(actions.size() / 2, actions.size() );
@@ -73,7 +73,7 @@ public class TestGameConcurrent {
     }
     @Test
     void testConcurrentWithOverlap() throws InterruptedException {
-        for (int i = 0; i < CONCURRENT_CHECKS; i++) {
+        for (int i = 0; i < NUM_CHECKS; i++) {
             Collections.shuffle(actions);
             Thread t1 = new Thread(() -> {
                 actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT));
@@ -93,35 +93,34 @@ public class TestGameConcurrent {
     }
     @Test
     void testConcurrentWithGameOver() throws InterruptedException {
-        for (int i = 0; i < CONCURRENT_CHECKS; i++) {
+        for (int i = 0; i < NUM_CHECKS; i++) {
+            game.resetGame();
+
             // select a random mine position and add it to the actions that will be executed
-            Random random = new Random();
-            Pair<Integer, Integer> errorAction = minesList.get(random.nextInt(minesList.size()));
+            // also, remove a good action to force the end of the game by mine explosion
+            Pair<Integer, Integer> errorAction = minesList.get(0);
+            Pair<Integer, Integer> okAction = actions.get(actions.size()-1);
             actions.add(errorAction);
+            actions.remove(okAction);
+
+            // execute the first "ok" action to prevent the "first action is a mine and must be ignored" case
+            game.action(0, 1, ActionType.VISIT);
 
             // shuffle actions
             Collections.shuffle(actions);
 
             // simulate 2 players
-            Thread t1 = new Thread(() -> {
-                actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT));
-            });
-            Thread t2 = new Thread(() -> {
-                actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT));
-            });
+            Thread t1 = new Thread(() -> actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT)));
+            Thread t2 = new Thread(() -> actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT)));
             t1.start();
             t2.start();
 
             t1.join();
             t2.join();
 
-            // remove error action
+            // reset everything
             actions.remove(errorAction);
-
-            System.out.println(Arrays.deepToString(game.getGridState()));
-            System.out.println(Arrays.deepToString(game.getGrid()));
-            System.out.println(game.isOver());
-            System.out.println(game.isLost());
+            actions.add(okAction);
 
             // check assertion
             assertTrue(game.isOver());
