@@ -64,6 +64,7 @@ function SessionsList() {
   }, []);
 
   function selectSession(roomId: String, sessionName:String) {
+    console.log(roomId, sessionName)
     navigate('/session', { state: {roomId: roomId, sessionName: sessionName} });
   }
 

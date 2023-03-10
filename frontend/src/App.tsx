@@ -1,11 +1,12 @@
 import {Outlet} from 'react-router-dom';
 import './App.css';
-
-console.log("ASDASD")
+import React from 'react';
 
 function App() {
   return (
-    <Outlet />
+    <React.StrictMode>
+      <Outlet />
+    </React.StrictMode>
   );
 }
 

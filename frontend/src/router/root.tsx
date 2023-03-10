@@ -2,7 +2,6 @@ import {
     createBrowserRouter,
   } from "react-router-dom";
 import SessionsList from "../views/SessionsList";
-import CreateSession from "../views/CreateSession";
 import WaitingStart from "../views/WaitingStart";
 import Game from "../views/Game";
 import App from "../App";
@@ -15,10 +14,6 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <SessionsList />,
-      },
-      {
-        path: "/create-session",
-        element: <CreateSession />,
       },
       {
         path: "/session",

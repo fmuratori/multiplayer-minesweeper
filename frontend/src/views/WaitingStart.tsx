@@ -11,8 +11,9 @@ function WaitingStart() {
 
   useEffect(() => {
     sessionSocket.on('connect', () => {
-      console.log('SocketIo [SESSION] - Connect to server-session');
+      console.log('SocketIo [SESSION] - Connect to server-session!');
       sessionSocket.emit('join_room', state.roomId)
+      ;
     });
     sessionSocket.on('disconnect', () => {
       console.log('SocketIo [SESSION] - Disconnect from server-session');
@@ -27,7 +28,7 @@ function WaitingStart() {
     });
     sessionSocket.on('session_error', (data: any) => {
       console.log('SocketIo - Session error', data);
-      setTimeout(() => navigate('/sessions'), 5000);
+      setTimeout(() => navigate('/'), 5000);
     });
 
     sessionSocket.open();
@@ -47,7 +48,7 @@ function WaitingStart() {
     sessionSocket.emit('leave_room', state.roomId, 
       () => {
         sessionSocket.close();
-        navigate('/sessions');
+        navigate('/');
       });
   }
 

@@ -1,7 +1,11 @@
-import React from 'react';
 import moment from 'moment';
 
 function SessionItem(props) {
+
+  function clicked() {
+    props.onClick(props.data);
+  }
+
   return (
     <div className='border rounded p-3 m-1'> 
       <div className='row align-items-center mb-1'>
@@ -22,7 +26,7 @@ function SessionItem(props) {
           </p>
         </div>
         <div className='col-auto'>
-          <button className='btn btn-primary' onClick={(e) => props.onClick(props.data)}>Join</button>
+          <button className='btn btn-primary' onClick={clicked}>Join</button>
         </div>
       </div>
     </div>
