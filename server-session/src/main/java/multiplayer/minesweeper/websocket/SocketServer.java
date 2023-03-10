@@ -25,7 +25,7 @@ public class SocketServer {
         controller = Controller.get();
         server = new SocketIOServer(config);
 
-        // namepsaces
+        // namespaces
         sessionNamespace = server.addNamespace("/session");
         browseNamespace = server.addNamespace("/browse");
 

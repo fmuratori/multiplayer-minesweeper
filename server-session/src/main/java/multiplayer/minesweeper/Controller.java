@@ -65,7 +65,6 @@ public class Controller {
         return result;
     }
 
-
     // Socket.IO methods
     public CompletableFuture<Map<String, Object>> handleJoinSession(String roomName) {
         var result = new CompletableFuture<Map<String, Object>>();
@@ -82,7 +81,6 @@ public class Controller {
                 output.put("num_connections", session.get().getNumConnectedUsers());
 
                 if (session.get().isFull()) {
-                    // TODO: convert this call into a promise
                     httpClient.sendGameRequest(roomName, session.get());
                     output.put("status", "GAME_STARTING");
                 } else {

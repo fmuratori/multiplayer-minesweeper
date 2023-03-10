@@ -38,6 +38,12 @@ public class Session {
     public String getGameMode() {
         return gameMode;
     }
+    public String getSessionName() {
+        return sessionName;
+    }
+    public String getRoomId() {
+        return roomId;
+    }
 
     public synchronized int getNumConnectedUsers() {
         return numConnectedUsers;
