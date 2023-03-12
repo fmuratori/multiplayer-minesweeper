@@ -40,7 +40,7 @@ public class Game {
         IntStream
                 .range(0, gameMode.getNumMines())
                 .map(i -> rand.nextInt(gameMode.getGridWidth() * gameMode.getGridHeight()))
-                .mapToObj(i -> new Pair<Integer, Integer>(i / gameMode.getGridWidth(), i % gameMode.getGridWidth()))
+                .mapToObj(i -> new Pair<>(i / gameMode.getGridWidth(), i % gameMode.getGridWidth()))
                 .forEach(point -> grid[point.x][point.y] = TileContent.MINE);
 
         precomputeGridContent();

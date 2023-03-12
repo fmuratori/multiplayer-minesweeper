@@ -6,7 +6,7 @@ public enum ActionType {
 
     public final String label;
 
-    private ActionType(String label) {
+    ActionType(String label) {
         this.label = label;
     }
 }
