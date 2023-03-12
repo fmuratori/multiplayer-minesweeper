@@ -5,6 +5,7 @@ import multiplayer.minesweeper.Controller;
 import multiplayer.minesweeper.gameutils.GameMode;
 import multiplayer.minesweeper.websocket.in.ActionObject;
 import multiplayer.minesweeper.websocket.in.JoinRoomObject;
+import multiplayer.minesweeper.websocket.in.LeaveRoomObject;
 import multiplayer.minesweeper.websocket.out.GameInfoObject;
 import multiplayer.minesweeper.websocket.out.GameOverObject;
 import multiplayer.minesweeper.websocket.out.GameUpdateObject;
@@ -38,7 +39,7 @@ public class SocketServer {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
             handleJoinRoomRequest(client, data);
         });
-        server.addEventListener("leave_room", JoinRoomObject.class, (client, data, ackSender) -> {
+        server.addEventListener("leave_room", LeaveRoomObject.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
             handleLeaveRoomRequest(client, data);
 
@@ -132,7 +133,7 @@ public class SocketServer {
             return object;
         });
     }
-    private void handleLeaveRoomRequest(SocketIOClient client, JoinRoomObject data) {
+    private void handleLeaveRoomRequest(SocketIOClient client, LeaveRoomObject data) {
         Controller.get().handleLeaveRoomRequest(data.getRoomName(), client.getSessionId()).thenApply((Map<String, Object> object) -> {
             var status = (String)object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {

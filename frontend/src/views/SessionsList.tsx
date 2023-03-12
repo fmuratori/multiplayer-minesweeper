@@ -34,7 +34,7 @@ function SessionsList() {
         const idx = sessions.findIndex(s => s.roomId === data.session.roomId);
         if (data.updateType === "NEW_SESSION" || (idx === -1 && data.updateType === "REMOVED_USER")) {
           sessions.push(data.session)
-        } else if (idx !== -1) {
+        } else if (idx != -1) {
           if (data.updateType === "REMOVED_USER" || data.updateType === "ADDED_USER") {
             sessions[idx] = data.session; 
           } else if (data.updateType === "CLOSED" || data.updateType === "GAME_STARTING") { 
@@ -64,7 +64,6 @@ function SessionsList() {
   }, []);
 
   function selectSession(roomId: String, sessionName:String) {
-    console.log(roomId, sessionName)
     navigate('/session', { state: {roomId: roomId, sessionName: sessionName} });
   }
 
@@ -91,7 +90,6 @@ function SessionsList() {
   function handleFormSubmit(e) {
     e.preventDefault();
     if (formState.sessionName === '' || formState.gameMode === null) {
-      console.log("ERROR")
       return
     }
 

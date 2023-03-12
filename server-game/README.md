@@ -1,11 +1,10 @@
 # Multiplayer Minesweeper - Game server
 
 This project contains the logic of a distributed system for a microservices oriented platform for multiplayer minesweeper game.
-Here the games instances and states are handled. 
-The main components of this project are:
+Here the games instances and states are handled and the main components of this project are:
 - a bidirectional socket implemented with Socket.IO
 - a basic REST API implemented with Vert.X
-- the logic for the management of many game instances
+- the core game logic for the management of multiple game instances
 
 # API specification
 
@@ -33,27 +32,28 @@ gradlew build
 ./gradlew test
 `
 
-# Execution with a docker container
+# Execution inside of a docker container
 
-**NB**: be sure to have instantiated a user defined bridge network. For more details, check the README file inside 
-the project main folder.
+**0. Create a user defined-network**
 
-**Build docker image**
+This container uses a user-defined bridge network to allow an easier management of connections toward other containers of the same micro-serve platform. 
+This step should be executed only once.
+
+``
+
+**1. Build the docker image**
 
 `
 docker build -t mmgame . --no-cache
 `
 
-**Running docker container**
-
 Flags:
-- -p      : map host ports to container ports
-- -it     : for interactive mode
-- --rm    : to remove previous versions of the container
-- --name  : give a name to the container 
-- --net   : specify the container network
+- -t            : the image tag
+- --no-cache    : force code changes to be applied
 
-`
+**2. Running docker container**
+
+````  
 docker run \
     -p 8003:8003 \
     -p 8004:8004 \
@@ -62,8 +62,20 @@ docker run \
     --network mmnetwork \
     --hostname mmgame \
     mmgame
-`
+````
+
+Flags:
+- -p           : map host ports to container ports
+- -it          : for interactive mode
+- --rm         : to remove previous versions of the container
+- --network    : the user defined network name (look at step 0)
+- --hostname   : name of the container inside the network
 
 # Execution with docker-compose
 
-The configuration of the docker compose file is in the project main folder.
+Alternatively, you can easily deploy the entire platform using docker compose. The configuration file is inside the main folder of this project. 
+To run the docker-compose use the following commands: 
+
+`docker compose build --no-cache`
+
+`docker compose up`

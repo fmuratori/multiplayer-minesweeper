@@ -12,9 +12,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 
-    // This dependency is used by the application.
-    implementation("com.google.guava:guava:29.0-jre") // TRY to remove
-
     implementation("io.vertx:vertx-core:4.3.4")
     implementation("io.vertx:vertx-web:4.3.4")
     implementation("io.vertx:vertx-web-client:4.3.4")

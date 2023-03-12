@@ -4,9 +4,7 @@ import React from 'react';
 
 function App() {
   return (
-    <React.StrictMode>
-      <Outlet />
-    </React.StrictMode>
+    <Outlet />
   );
 }
 

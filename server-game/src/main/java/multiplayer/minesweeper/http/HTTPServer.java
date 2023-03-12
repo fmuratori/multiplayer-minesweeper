@@ -32,7 +32,7 @@ public class HTTPServer extends AbstractVerticle {
     }
 
     private void handleNewGameRequest(RoutingContext rc, Buffer bodyHandler) {
-        JsonObject body = null;
+        JsonObject body;
         try {
             body = bodyHandler.toJsonObject();
         } catch (DecodeException e) {

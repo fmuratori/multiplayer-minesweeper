@@ -21,11 +21,11 @@ function Game() {
   useEffect(() => {
     gameSocket.on('connect', () => {
       console.log('SocketIo [GAME] - Connect to server-game');
-      console.log('join_room', state.roomName)
       gameSocket.emit('join_room', state.roomName);
     });
     gameSocket.on('disconnect', () => {
       console.log('SocketIo [GAME] - Disconnect from server-game');
+      gameSocket.emit('leave_room', state.roomName);
       
       // show disconnection message and redirect to home button
       setTimeout(() => navigate('/'), 5000);
@@ -132,8 +132,10 @@ function Game() {
 
   function disconnect(e:React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    gameSocket.close();
-    navigate('/');
+    gameSocket.emit('leave_room', state.roomName, () => {
+      gameSocket.close();
+      navigate('/');
+    });
   }
 
   function drawTable() {
