@@ -52,7 +52,7 @@ public class Controller {
                     } else {
                         output.put("connectedClients", connectedClients);
                         output.put("roomId", roomId);
-                        output.put("status", "GAME_DELETED");
+                        output.put("status", "USER_REMOVED");
                     }
                 }
             }

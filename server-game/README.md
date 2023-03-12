@@ -64,7 +64,6 @@ docker run \
     mmgame
 `
 
-    --name mmgame \
 # Execution with docker-compose
 
 The configuration of the docker compose file is in the project main folder.

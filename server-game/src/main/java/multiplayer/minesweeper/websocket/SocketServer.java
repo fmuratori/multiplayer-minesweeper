@@ -8,7 +8,7 @@ import multiplayer.minesweeper.websocket.in.JoinRoomObject;
 import multiplayer.minesweeper.websocket.out.GameInfoObject;
 import multiplayer.minesweeper.websocket.out.GameOverObject;
 import multiplayer.minesweeper.websocket.out.GameUpdateObject;
-import multiplayer.minesweeper.websocket.out.NewConnectionObject;
+import multiplayer.minesweeper.websocket.out.PlayersCountObject;
 
 import java.util.*;
 
@@ -61,14 +61,14 @@ public class SocketServer {
 
             switch (status) {
                 case "USER_REMOVED":
-                    System.out.println("[Socket.IO] - Socket ID [\" + client.getSessionId().toString() + \"] Removed user from game");
+                    System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Removed user from game");
                     server.getRoomOperations(roomId).sendEvent("players_count_update",
-                            new NewConnectionObject(connectedClients));
+                            new PlayersCountObject(connectedClients));
                 case "GAME_DELETED":
-                    System.out.println("[Socket.IO] - Socket ID [\" + client.getSessionId().toString() + \"] Deleted game with no users connected");
+                    System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Deleted game with no users connected");
                     break;
                 case "GAME_NOT_FOUND":
-                    System.out.println("[Socket.IO] - Socket ID [\" + client.getSessionId().toString() + \"] Game for client " + client.getSessionId() + " not found" );
+                    System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game for client " + client.getSessionId() + " not found" );
             }
 
             return object;
@@ -77,7 +77,7 @@ public class SocketServer {
     private void handleActionRequest(SocketIOClient client, ActionObject data) {
         Optional<String> roomId = client.getAllRooms().stream().filter((name) -> !name.equals("")).findFirst();
         if (roomId.isEmpty()) {
-            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] Room not found");
+            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Room not found");
             return;
         }
 
@@ -85,7 +85,7 @@ public class SocketServer {
                 .thenApply((Map<String, Object> object) -> {
             var status = (String)object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {
-                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] Game not found");
+                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game not found");
             } else if (status.equals("EXECUTED")) {
                 var actionResult = (String) object.get("actionResult");
                 var map = (String) object.get("map");
@@ -113,9 +113,9 @@ public class SocketServer {
         Controller.get().handleJoinRoomRequest(data.getRoomName(), client.getSessionId()).thenApply((Map<String, Object> object) -> {
             var status = (String)object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {
-                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] Game not found");
+                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game not found");
             } else if (status.equals("JOINED")) {
-                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] Player joined room");
+                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Player joined room");
                 var map = (String)object.get("map");
                 var gameMode = (GameMode)object.get("gameMode");
                 var startedAt = (String)object.get("startedAt");
@@ -127,7 +127,7 @@ public class SocketServer {
 
                 // send new user connection to all connected users
                 server.getRoomOperations(data.getRoomName()).sendEvent("players_count_update",
-                        new NewConnectionObject(playersCount));
+                        new PlayersCountObject(playersCount));
             }
             return object;
         });
@@ -136,12 +136,12 @@ public class SocketServer {
         Controller.get().handleLeaveRoomRequest(data.getRoomName(), client.getSessionId()).thenApply((Map<String, Object> object) -> {
             var status = (String)object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {
-                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] Game not found");
+                System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game not found");
             } else if (status.equals("LEFT")) {
                 var playersCount = (int)object.get("playersCount");
                 client.leaveRoom(data.getRoomName());
                 server.getRoomOperations(data.getRoomName()).sendEvent("players_count_update",
-                        new NewConnectionObject(playersCount));
+                        new PlayersCountObject(playersCount));
             }
             return object;
         });

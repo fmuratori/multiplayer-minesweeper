@@ -3,6 +3,7 @@ package multiplayer.minesweeper.gameutils;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO: move into a separate configuration file?
 public class GameModeFactory {
     public static GameMode smallGrid() {
         return new GameMode("SMALL", 9, 9, 1, 10);
@@ -13,7 +14,7 @@ public class GameModeFactory {
     }
 
     public static GameMode bigGrid() {
-        return new GameMode("BIG", 30, 16, 2, 90);
+        return new GameMode("LARGE", 30, 16, 2, 90);
     }
 
     public static GameMode testGrid(int width, int height) {
@@ -27,7 +28,7 @@ public class GameModeFactory {
     public static GameMode getByName(String name) {
         switch (name) {
             case "MEDIUM": return mediumGrid();
-            case "BIG": return bigGrid();
+            case "LARGE": return bigGrid();
             case "SMALL": return smallGrid();
             default: throw new IllegalArgumentException();
         }
