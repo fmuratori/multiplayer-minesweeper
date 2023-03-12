@@ -7,30 +7,30 @@ trigger:frontend:
   trigger:
     include: frontend/.gitlab-ci.yml
     strategy: depend
-  rules:
-    - changes:
-        - frontend/*
-        - .gitlab-ci.yml
+  # rules:
+  #   - changes:
+  #       - frontend/*
+  #       - .gitlab-ci.yml
 
 trigger:session:
   stage: triggers
   trigger:
     include: server-session/.gitlab-ci.yml
     strategy: depend
-  rules:
-    - changes:
-        - server_session/*
-        - .gitlab-ci.yml
+  # rules:
+  #   - changes:
+  #       - server_session/*
+  #       - .gitlab-ci.yml
 
 trigger:game:
   stage: triggers
   trigger:
     include: server-game/.gitlab-ci.yml
     strategy: depend
-  rules:
-    - changes:
-        - server_game/*
-        - .gitlab-ci.yml
+  # rules:
+  #   - changes:
+  #       - server_game/*
+  #       - .gitlab-ci.yml
 
 deploy-prod:
   stage: deploy
