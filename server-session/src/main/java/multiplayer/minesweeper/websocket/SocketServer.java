@@ -6,8 +6,8 @@ import com.corundumstudio.socketio.SocketIONamespace;
 import com.corundumstudio.socketio.SocketIOServer;
 import multiplayer.minesweeper.Controller;
 import multiplayer.minesweeper.sessions.Session;
-import multiplayer.minesweeper.websocket.in.JoinRoomObject;
-import multiplayer.minesweeper.websocket.in.LeaveRoomObject;
+import multiplayer.minesweeper.websocket.in.JoinRoomMessage;
+import multiplayer.minesweeper.websocket.in.LeaveRoomMessage;
 import multiplayer.minesweeper.websocket.out.*;
 
 import java.util.List;
@@ -38,12 +38,12 @@ public class SocketServer {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Disconnected from namespace /session");
         });
 
-        sessionNamespace.addEventListener("join_room", JoinRoomObject.class, (client, data, ackSender) -> {
+        sessionNamespace.addEventListener("join_room", JoinRoomMessage.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
             handleJoinRoomRequest(client, data);
         });
 
-        sessionNamespace.addEventListener("leave_room", LeaveRoomObject.class, (client, data, ackSender) -> {
+        sessionNamespace.addEventListener("leave_room", LeaveRoomMessage.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
             handleLeaveRoomRequest(client, data);
         });
@@ -60,34 +60,34 @@ public class SocketServer {
 
     private void handleBrowseConnection(SocketIOClient client) {
         controller.handleNewConnection().thenApply((List<Session> sessions) -> {
-            client.sendEvent("sessions_update", new SessionsUpdateObject(sessions));
+            client.sendEvent("sessions_update", new SessionsUpdateMessage(sessions));
             return sessions;
         });
     }
 
-    private void handleLeaveRoomRequest(SocketIOClient client, LeaveRoomObject data) {
+    private void handleLeaveRoomRequest(SocketIOClient client, LeaveRoomMessage data) {
         String roomName = data.getRoomName();
         controller.handleLeaveSession(roomName).thenApply((Map<String, Object> object) -> {
             String status = (String) object.get("status");
             Session session = (Session) object.get("session");
             switch (status) {
                 case "NO_SESSION":
-                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session not found"));
+                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionErrorMessage("Session not found"));
                     break;
                 case "FULL_SESSION":
-                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session is empty"));
+                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionErrorMessage("Session is empty"));
                     break;
                 case "LEFT":
                     client.leaveRoom(roomName);
                     int connectedClients = server.getRoomOperations(roomName).getClients().size();
-                    server.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(connectedClients, session.getNumPlayers()));
-                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session, SessionUpdateType.REMOVED_USER));
+                    server.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountMessage(connectedClients, session.getNumPlayers()));
+                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateMessage(session, SessionUpdateType.REMOVED_USER));
             }
             return object;
         });
     }
 
-    private void handleJoinRoomRequest(SocketIOClient client, JoinRoomObject data) {
+    private void handleJoinRoomRequest(SocketIOClient client, JoinRoomMessage data) {
         String roomName = data.getRoomName();
 
         controller.handleJoinSession(roomName).thenApply((Map<String, Object> object) -> {
@@ -103,20 +103,20 @@ public class SocketServer {
 
             switch (status) {
                 case "NO_SESSION":
-                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session not found"));
+                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionErrorMessage("Session not found"));
                     break;
                 case "FULL_SESSION":
-                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionError("Session is full"));
+                    sessionNamespace.getRoomOperations(roomName).sendEvent("session_error", new SessionErrorMessage("Session is full"));
                     break;
                 case "JOINED":
                     client.joinRoom(roomName);
-                    sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(numConnectedClients, numMaxPlayers));
-                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session, SessionUpdateType.ADDED_USER));
+                    sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountMessage(numConnectedClients, numMaxPlayers));
+                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateMessage(session, SessionUpdateType.ADDED_USER));
                     break;
                 case "GAME_STARTING":
                     client.joinRoom(roomName);
-                    sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountObject(numConnectedClients, numMaxPlayers));
-                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session, SessionUpdateType.GAME_STARTING));
+                    sessionNamespace.getRoomOperations(roomName).sendEvent("players_count_update", new PlayersCountMessage(numConnectedClients, numMaxPlayers));
+                    browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateMessage(session, SessionUpdateType.GAME_STARTING));
                     break;
             }
             return object;
@@ -126,18 +126,21 @@ public class SocketServer {
     public void sendGameStartingMessage(Session session, String sessionRoomName, String gameRoomName) {
         sessionNamespace
                 .getRoomOperations(sessionRoomName)
-                .sendEvent("game_starting", new GameStartingObject(gameRoomName, session));
+                .sendEvent("game_starting", new GameStartingMessage(gameRoomName, session));
     }
 
     public void sendGameStartingError(String sessionRoomName) {
         sessionNamespace
                 .getRoomOperations(sessionRoomName)
-                .sendEvent("session_error", new SessionError("Game server unreachable"));
+                .sendEvent("session_error", new SessionErrorMessage("Game server unreachable"));
     }
 
     public void emitSessionUpdate(Session session) {
-        browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateObject(session, SessionUpdateType.NEW_SESSION));
+        browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateMessage(session, SessionUpdateType.NEW_SESSION));
     }
 
+    public void emitGameStartingFromTimer(Session session) {
+        browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateMessage(session, SessionUpdateType.GAME_STARTING));
+    }
 }
 

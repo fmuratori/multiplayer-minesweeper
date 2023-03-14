@@ -47,8 +47,10 @@ public class Controller {
     }
 
     public void handleGameStartingError(String sessionRoomName) {
-        sessionsManager.removeSession(sessionRoomName);
-        executor.execute(() -> socketServer.sendGameStartingError(sessionRoomName));
+        executor.execute(() -> {
+            sessionsManager.removeSession(sessionRoomName);
+            socketServer.sendGameStartingError(sessionRoomName);
+        });
     }
 
     public CompletableFuture<String> handleNewSessionRequest(String sessionName, String mode, int numPlayers, int gridWidth, int gridHeight) {
@@ -80,7 +82,7 @@ public class Controller {
                 output.put("session", session.get());
                 output.put("num_connections", session.get().getNumConnectedUsers());
 
-                if (session.get().isFull()) {
+                if (session.get().canStartGame()) {
                     httpClient.sendGameRequest(roomName, session.get());
                     output.put("status", "GAME_STARTING");
                 } else {
@@ -90,6 +92,11 @@ public class Controller {
             result.complete(output);
         });
         return result;
+    }
+
+    public void sendGameStartingRequest(String roomName, Session session) {
+        httpClient.sendGameRequest(roomName, session);
+        socketServer.emitGameStartingFromTimer(session);
     }
 
     public CompletableFuture<Map<String, Object>> handleLeaveSession(String roomName) {

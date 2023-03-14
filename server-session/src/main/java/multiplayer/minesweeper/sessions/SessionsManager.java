@@ -9,24 +9,24 @@ public class SessionsManager {
     public SessionsManager() {
     }
 
-    public Optional<Session> getSession(String roomId) {
+    public synchronized Optional<Session> getSession(String roomId) {
         if (!sessions.containsKey(roomId))
             return Optional.empty();
         else
             return Optional.of(sessions.get(roomId));
     }
 
-    public Session addSession(String roomId, String sessionName, String mode, int numPlayers, int gridWidth, int gridHeight) {
+    public synchronized Session addSession(String roomId, String sessionName, String mode, int numPlayers, int gridWidth, int gridHeight) {
         var newSession = new Session(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
         sessions.put(roomId, newSession);
         return newSession;
     }
 
-    public void removeSession(String roomId) {
+    public synchronized void removeSession(String roomId) {
         sessions.remove(roomId);
     }
 
-    public List<Session> getOpenSessionsByMode(String mode) {
+    public synchronized List<Session> getOpenSessionsByMode(String mode) {
         return sessions
                 .values()
                 .stream()
@@ -34,7 +34,7 @@ public class SessionsManager {
                 .collect(Collectors.toList());
     }
 
-    public List<Session> getOpenSessions() {
+    public synchronized List<Session> getOpenSessions() {
         return sessions.values().stream().filter(s -> !s.isFull()).collect(Collectors.toList());
     }
 }

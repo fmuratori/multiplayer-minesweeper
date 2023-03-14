@@ -1,13 +1,13 @@
 package multiplayer.minesweeper.websocket.in;
 
-public class JoinRoomObject {
+public class JoinRoomMessage {
 
     private String roomName;
 
-    public JoinRoomObject() {
+    public JoinRoomMessage() {
     }
 
-    public JoinRoomObject(String roomName) {
+    public JoinRoomMessage(String roomName) {
         super();
         this.roomName = roomName;
     }

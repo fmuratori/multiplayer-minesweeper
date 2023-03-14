@@ -4,13 +4,13 @@ import multiplayer.minesweeper.sessions.Session;
 
 import java.util.List;
 
-public class SessionsUpdateObject {
+public class SessionsUpdateMessage {
     private List<Session> sessions;
 
-    public SessionsUpdateObject() {
+    public SessionsUpdateMessage() {
     }
 
-    public SessionsUpdateObject(List<Session> sessions) {
+    public SessionsUpdateMessage(List<Session> sessions) {
         this.sessions = sessions;
     }
 

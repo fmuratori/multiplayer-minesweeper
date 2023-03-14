@@ -2,15 +2,15 @@ package multiplayer.minesweeper.websocket.out;
 
 import multiplayer.minesweeper.sessions.Session;
 
-public class GameStartingObject {
+public class GameStartingMessage {
 
     private String roomName;
     private Session session;
 
-    public GameStartingObject() {
+    public GameStartingMessage() {
     }
 
-    public GameStartingObject(String roomName, Session session) {
+    public GameStartingMessage(String roomName, Session session) {
         this.roomName = roomName;
         this.session = session;
     }

@@ -1,12 +1,12 @@
 package multiplayer.minesweeper.websocket.out;
 
-public class SessionError {
+public class SessionErrorMessage {
     private String message;
 
-    public SessionError() {
+    public SessionErrorMessage() {
     }
 
-    public SessionError(String message) {
+    public SessionErrorMessage(String message) {
         this.message = message;
     }
 

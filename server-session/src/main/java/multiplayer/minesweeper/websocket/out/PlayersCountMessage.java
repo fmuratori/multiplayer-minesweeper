@@ -1,14 +1,14 @@
 package multiplayer.minesweeper.websocket.out;
 
-public class PlayersCountObject {
+public class PlayersCountMessage {
 
     private int connectedCount;
     private int maxPlayersCount;
 
-    public PlayersCountObject() {
+    public PlayersCountMessage() {
     }
 
-    public PlayersCountObject(int count, int maxCount) {
+    public PlayersCountMessage(int count, int maxCount) {
         super();
         this.connectedCount = count;
         this.maxPlayersCount = maxCount;

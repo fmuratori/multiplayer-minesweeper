@@ -2,14 +2,14 @@ package multiplayer.minesweeper.websocket.out;
 
 import multiplayer.minesweeper.sessions.Session;
 
-public class SessionUpdateObject {
+public class SessionUpdateMessage {
     private Session session;
     private SessionUpdateType updateType;
 
-    public SessionUpdateObject() {
+    public SessionUpdateMessage() {
     }
 
-    public SessionUpdateObject(Session session, SessionUpdateType updateType) {
+    public SessionUpdateMessage(Session session, SessionUpdateType updateType) {
         this.session = session;
         this.updateType = updateType;
     }

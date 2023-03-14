@@ -1,5 +1,10 @@
 package multiplayer.minesweeper.sessions;
 
+import multiplayer.minesweeper.sessionutils.StartStrategy;
+import multiplayer.minesweeper.sessionutils.StartStrategyAlwaysTrue;
+import multiplayer.minesweeper.sessionutils.StartStrategyMaxPlayers;
+import multiplayer.minesweeper.sessionutils.StartStrategyTimer;
+
 import java.util.Date;
 
 public class Session {
@@ -12,6 +17,8 @@ public class Session {
     private final int gridHeight;
     private int numConnectedUsers;
 
+    private StartStrategy behaviour;
+
     public Session(String roomId, String sessionName, String gameMode, int numPlayers, int gridWidth, int gridHeight) {
         this.roomId = roomId;
         this.sessionName = sessionName;
@@ -21,6 +28,7 @@ public class Session {
         this.gridHeight = gridHeight;
         this.numPlayers = numPlayers;
         this.creationDate = new Date();
+        this.behaviour = new StartStrategyMaxPlayers(this);
     }
 
     public synchronized void addConnectedUsers() {
@@ -55,5 +63,9 @@ public class Session {
 
     public synchronized boolean isEmpty() {
         return numConnectedUsers == 0;
+    }
+
+    public boolean canStartGame() {
+        return this.behaviour.checkCondition();
     }
 }
