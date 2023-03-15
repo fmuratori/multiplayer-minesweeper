@@ -1,13 +1,13 @@
 package multiplayer.minesweeper.websocket.out;
 
-public class GameUpdateObject {
+public class GameUpdateMessage {
 
     private String map;
 
-    public GameUpdateObject() {
+    public GameUpdateMessage() {
     }
 
-    public GameUpdateObject(String map) {
+    public GameUpdateMessage(String map) {
         super();
         this.map = map;
     }

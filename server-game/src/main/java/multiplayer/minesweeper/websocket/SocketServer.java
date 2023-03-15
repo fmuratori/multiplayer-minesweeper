@@ -5,13 +5,13 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import multiplayer.minesweeper.Controller;
 import multiplayer.minesweeper.gameutils.GameMode;
-import multiplayer.minesweeper.websocket.in.ActionObject;
-import multiplayer.minesweeper.websocket.in.JoinRoomObject;
-import multiplayer.minesweeper.websocket.in.LeaveRoomObject;
-import multiplayer.minesweeper.websocket.out.GameInfoObject;
-import multiplayer.minesweeper.websocket.out.GameOverObject;
-import multiplayer.minesweeper.websocket.out.GameUpdateObject;
-import multiplayer.minesweeper.websocket.out.PlayersCountObject;
+import multiplayer.minesweeper.websocket.in.ActionMessage;
+import multiplayer.minesweeper.websocket.in.JoinRoomMessage;
+import multiplayer.minesweeper.websocket.in.LeaveRoomMessage;
+import multiplayer.minesweeper.websocket.out.GameInfoMessage;
+import multiplayer.minesweeper.websocket.out.GameOverMessage;
+import multiplayer.minesweeper.websocket.out.GameUpdateMessage;
+import multiplayer.minesweeper.websocket.out.PlayersCountMessage;
 
 import java.util.Map;
 import java.util.Optional;
@@ -35,15 +35,15 @@ public class SocketServer {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Disconnected from socket");
             handleClientDisconnect(client);
         });
-        server.addEventListener("action", ActionObject.class, (client, data, ackSender) -> {
+        server.addEventListener("action", ActionMessage.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
             handleActionRequest(client, data);
         });
-        server.addEventListener("join_room", JoinRoomObject.class, (client, data, ackSender) -> {
+        server.addEventListener("join_room", JoinRoomMessage.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
             handleJoinRoomRequest(client, data);
         });
-        server.addEventListener("leave_room", LeaveRoomObject.class, (client, data, ackSender) -> {
+        server.addEventListener("leave_room", LeaveRoomMessage.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
             handleLeaveRoomRequest(client, data);
 
@@ -68,7 +68,7 @@ public class SocketServer {
                 case "USER_REMOVED":
                     System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Removed user from game");
                     server.getRoomOperations(roomId).sendEvent("players_count_update",
-                            new PlayersCountObject(connectedClients));
+                            new PlayersCountMessage(connectedClients));
                 case "GAME_DELETED":
                     System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Deleted game with no users connected");
                     break;
@@ -80,7 +80,7 @@ public class SocketServer {
         });
     }
 
-    private void handleActionRequest(SocketIOClient client, ActionObject data) {
+    private void handleActionRequest(SocketIOClient client, ActionMessage data) {
         Optional<String> roomId = client.getAllRooms().stream().filter((name) -> !name.equals("")).findFirst();
         if (roomId.isEmpty()) {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Room not found");
@@ -100,13 +100,13 @@ public class SocketServer {
                             duration = (long) object.get("duration");
                         switch (actionResult) {
                             case "EXPLOSION":
-                                server.getRoomOperations(roomId.get()).sendEvent("game_lost", new GameOverObject(map, duration));
+                                server.getRoomOperations(roomId.get()).sendEvent("game_lost", new GameOverMessage(map, duration));
                                 break;
                             case "GAME_OVER":
-                                server.getRoomOperations(roomId.get()).sendEvent("game_won", new GameOverObject(map, duration));
+                                server.getRoomOperations(roomId.get()).sendEvent("game_won", new GameOverMessage(map, duration));
                                 break;
                             case "OK":
-                                server.getRoomOperations(roomId.get()).sendEvent("game_update", new GameUpdateObject(map));
+                                server.getRoomOperations(roomId.get()).sendEvent("game_update", new GameUpdateMessage(map));
                                 break;
                             case "IGNORED":
                                 break;
@@ -116,7 +116,7 @@ public class SocketServer {
                 });
     }
 
-    private void handleJoinRoomRequest(SocketIOClient client, JoinRoomObject data) {
+    private void handleJoinRoomRequest(SocketIOClient client, JoinRoomMessage data) {
         Controller.get().handleJoinRoomRequest(data.getRoomName(), client.getSessionId()).thenApply((Map<String, Object> object) -> {
             var status = (String) object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {
@@ -130,17 +130,17 @@ public class SocketServer {
 
                 // if success
                 client.joinRoom(data.getRoomName());
-                client.sendEvent("game_info", new GameInfoObject(map, gameMode, startedAt));
+                client.sendEvent("game_info", new GameInfoMessage(map, gameMode, startedAt));
 
                 // send new user connection to all connected users
                 server.getRoomOperations(data.getRoomName()).sendEvent("players_count_update",
-                        new PlayersCountObject(playersCount));
+                        new PlayersCountMessage(playersCount));
             }
             return object;
         });
     }
 
-    private void handleLeaveRoomRequest(SocketIOClient client, LeaveRoomObject data) {
+    private void handleLeaveRoomRequest(SocketIOClient client, LeaveRoomMessage data) {
         Controller.get().handleLeaveRoomRequest(data.getRoomName(), client.getSessionId()).thenApply((Map<String, Object> object) -> {
             var status = (String) object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {
@@ -149,7 +149,7 @@ public class SocketServer {
                 var playersCount = (int) object.get("playersCount");
                 client.leaveRoom(data.getRoomName());
                 server.getRoomOperations(data.getRoomName()).sendEvent("players_count_update",
-                        new PlayersCountObject(playersCount));
+                        new PlayersCountMessage(playersCount));
             }
             return object;
         });

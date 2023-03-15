@@ -1,13 +1,13 @@
 package multiplayer.minesweeper.websocket.in;
 
-public class LeaveRoomObject {
+public class JoinRoomMessage {
 
     private String roomName;
 
-    public LeaveRoomObject() {
+    public JoinRoomMessage() {
     }
 
-    public LeaveRoomObject(String roomName) {
+    public JoinRoomMessage(String roomName) {
         super();
         this.roomName = roomName;
     }
@@ -18,7 +18,7 @@ public class LeaveRoomObject {
 
     @Override
     public String toString() {
-        return "LeaveRoomObject{" +
+        return "JoinRoomObject{" +
                 "roomName='" + roomName + '\'' +
                 '}';
     }

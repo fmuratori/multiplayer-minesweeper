@@ -1,13 +1,13 @@
 package multiplayer.minesweeper.websocket.out;
 
-public class GameOverObject extends GameUpdateObject {
+public class GameOverMessage extends GameUpdateMessage {
     private long duration;
 
-    public GameOverObject() {
+    public GameOverMessage() {
         super();
     }
 
-    public GameOverObject(String map, long duration) {
+    public GameOverMessage(String map, long duration) {
         super(map);
         this.duration = duration;
     }

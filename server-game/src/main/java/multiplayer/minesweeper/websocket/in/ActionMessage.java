@@ -1,16 +1,16 @@
 package multiplayer.minesweeper.websocket.in;
 
-public class ActionObject {
+public class ActionMessage {
 
     private int xCoordinate;
     private int yCoordinate;
 
     private String action;
 
-    public ActionObject() {
+    public ActionMessage() {
     }
 
-    public ActionObject(int xCoordinate, int yCoordinate, String action) {
+    public ActionMessage(int xCoordinate, int yCoordinate, String action) {
         super();
         this.action = action;
     }

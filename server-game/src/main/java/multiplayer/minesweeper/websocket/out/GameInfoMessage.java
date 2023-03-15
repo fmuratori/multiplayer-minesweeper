@@ -2,7 +2,7 @@ package multiplayer.minesweeper.websocket.out;
 
 import multiplayer.minesweeper.gameutils.GameMode;
 
-public class GameInfoObject extends GameUpdateObject {
+public class GameInfoMessage extends GameUpdateMessage {
 
     private int minesCount;
     private int numMaxPlayers;
@@ -11,10 +11,10 @@ public class GameInfoObject extends GameUpdateObject {
 
     private String startedAt;
 
-    public GameInfoObject() {
+    public GameInfoMessage() {
     }
 
-    public GameInfoObject(String map, GameMode gameMode, String startedAt) {
+    public GameInfoMessage(String map, GameMode gameMode, String startedAt) {
         super(map);
         this.minesCount = gameMode.getNumMines();
         this.numMaxPlayers = gameMode.getNumPlayers();
