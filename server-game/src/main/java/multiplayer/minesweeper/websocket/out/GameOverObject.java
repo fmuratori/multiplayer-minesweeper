@@ -6,10 +6,12 @@ public class GameOverObject extends GameUpdateObject {
     public GameOverObject() {
         super();
     }
+
     public GameOverObject(String map, long duration) {
         super(map);
         this.duration = duration;
     }
+
     public long getDuration() {
         return duration;
     }

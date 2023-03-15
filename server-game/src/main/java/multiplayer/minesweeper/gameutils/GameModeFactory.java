@@ -27,10 +27,14 @@ public class GameModeFactory {
 
     public static GameMode getByName(String name) {
         switch (name) {
-            case "MEDIUM": return mediumGrid();
-            case "LARGE": return bigGrid();
-            case "SMALL": return smallGrid();
-            default: throw new IllegalArgumentException();
+            case "MEDIUM":
+                return mediumGrid();
+            case "LARGE":
+                return bigGrid();
+            case "SMALL":
+                return smallGrid();
+            default:
+                throw new IllegalArgumentException();
         }
     }
 

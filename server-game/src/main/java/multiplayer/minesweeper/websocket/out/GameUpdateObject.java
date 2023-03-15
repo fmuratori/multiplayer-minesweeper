@@ -4,7 +4,8 @@ public class GameUpdateObject {
 
     private String map;
 
-    public GameUpdateObject() {}
+    public GameUpdateObject() {
+    }
 
     public GameUpdateObject(String map) {
         super();

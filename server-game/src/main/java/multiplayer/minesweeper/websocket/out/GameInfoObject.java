@@ -11,7 +11,8 @@ public class GameInfoObject extends GameUpdateObject {
 
     private String startedAt;
 
-    public GameInfoObject() {}
+    public GameInfoObject() {
+    }
 
     public GameInfoObject(String map, GameMode gameMode, String startedAt) {
         super(map);

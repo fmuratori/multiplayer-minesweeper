@@ -6,8 +6,8 @@ package multiplayer.minesweeper.http;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.DecodeException;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -44,11 +44,11 @@ public class HTTPServer extends AbstractVerticle {
         }
 
         Controller.get().handleNewGameRequest(body.getString("name")).thenApply((Map<String, Object> object) -> {
-            var status = (String)object.get("status");
+            var status = (String) object.get("status");
             if (status.equals("GAME_MODE_ERROR")) {
                 System.out.println("[HTTP Server] - Error occurred while handling a game creation request");
             } else if (status.equals("CREATED")) {
-                var gameId = (String)object.get("gameId");
+                var gameId = (String) object.get("gameId");
                 rc.response()
                         .setStatusCode(200)
                         .putHeader("content-type",
@@ -69,7 +69,7 @@ public class HTTPServer extends AbstractVerticle {
 
     private void handleGameModesRequest(RoutingContext rc) {
         Controller.get().handleGameModesRequest().thenApply((Map<String, Object> object) -> {
-            var status = (String)object.get("status");
+            var status = (String) object.get("status");
             if (!status.equals("LIST")) {
                 System.out.println("[HTTP Server] - Error occurred while handling a game creation request");
             } else {

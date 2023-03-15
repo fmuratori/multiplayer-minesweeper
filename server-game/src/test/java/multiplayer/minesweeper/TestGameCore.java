@@ -29,17 +29,17 @@ public class TestGameCore {
 
     @Test
     void testInitialization() {
-        assertSame(gameManager.getGrid()[0][0], TileContent.MINE);
-        assertSame(gameManager.getGrid()[1][1], TileContent.MINE);
-        assertSame(gameManager.getGrid()[2][0], TileContent.MINE);
-        assertSame(gameManager.getGrid()[0][1], TileContent.NEAR_2);
-        assertSame(gameManager.getGrid()[1][0], TileContent.NEAR_3);
-        assertSame(gameManager.getGrid()[2][2], TileContent.NEAR_1);
-        assertSame(gameManager.getGrid()[2][1], TileContent.NEAR_2);
+        assertSame(gameManager.getTiles()[0][0].getContent(), TileContent.MINE);
+        assertSame(gameManager.getTiles()[1][1].getContent(), TileContent.MINE);
+        assertSame(gameManager.getTiles()[2][0].getContent(), TileContent.MINE);
+        assertSame(gameManager.getTiles()[0][1].getContent(), TileContent.NEAR_2);
+        assertSame(gameManager.getTiles()[1][0].getContent(), TileContent.NEAR_3);
+        assertSame(gameManager.getTiles()[2][2].getContent(), TileContent.NEAR_1);
+        assertSame(gameManager.getTiles()[2][1].getContent(), TileContent.NEAR_2);
 
         for (int i  = 0; i < GRID_HEIGHT; i++)
             for (int j  = 0; j < GRID_WIDTH; j++)
-                assertSame(gameManager.getGridState()[i][j], TileState.NOT_VISITED);
+                assertSame(gameManager.getTiles()[i][j].getState(), TileState.NOT_VISITED);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class TestGameCore {
         int visitedTiles = 0;
         for (int i  = 0; i < GRID_HEIGHT; i++)
             for (int j  = 0; j < GRID_WIDTH; j++)
-                if (gameManager.getGridState()[i][j] == TileState.VISITED) visitedTiles++;
+                if (gameManager.getTiles()[i][j].getState() == TileState.VISITED) visitedTiles++;
 
         assertEquals(visitedTiles, 1);
 
@@ -63,7 +63,7 @@ public class TestGameCore {
         int visitedTiles = 0;
         for (int i  = 0; i < GRID_HEIGHT; i++)
             for (int j  = 0; j < GRID_WIDTH; j++)
-                if (gameManager.getGridState()[i][j] == TileState.VISITED) visitedTiles++;
+                if (gameManager.getTiles()[i][j].getState() == TileState.VISITED) visitedTiles++;
 
         assertEquals(visitedTiles, 10); // 4*4 tiles - (3 mines + 1 isolated tile)
     }
@@ -72,15 +72,15 @@ public class TestGameCore {
     public void testFlagAction() {
         ActionResult result = gameManager.action(0, 0, ActionType.FLAG);
         assertEquals(result, ActionResult.OK);
-        assertEquals(gameManager.getGridState()[0][0], TileState.FLAGGED);
+        assertEquals(gameManager.getTiles()[0][0].getState(), TileState.FLAGGED);
 
         ActionResult result2 = gameManager.action(0, 0, ActionType.FLAG);
         assertEquals(result2, ActionResult.OK);
-        assertEquals(gameManager.getGridState()[0][0], TileState.NOT_VISITED);
+        assertEquals(gameManager.getTiles()[0][0].getState(), TileState.NOT_VISITED);
 
         ActionResult result3 = gameManager.action(0, 1, ActionType.FLAG);
         assertEquals(result3, ActionResult.OK);
-        assertEquals(gameManager.getGridState()[0][1], TileState.FLAGGED);
+        assertEquals(gameManager.getTiles()[0][1].getState(), TileState.FLAGGED);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class TestGameCore {
         ActionResult result2 = gameManager.action(1, 1, ActionType.VISIT);
         assertEquals(result2, ActionResult.EXPLOSION);
 
-        assertEquals(gameManager.getGridState()[1][1], TileState.EXPLODED);
+        assertEquals(gameManager.getTiles()[1][1].getState(), TileState.EXPLODED);
 
         ActionResult result3 = gameManager.action(1, 1, ActionType.VISIT);
         assertEquals(result3, ActionResult.IGNORED);
@@ -102,7 +102,7 @@ public class TestGameCore {
         ActionResult result1 = gameManager.action(0, 0, ActionType.VISIT);
         assertEquals(result1, ActionResult.OK);
 
-        assertEquals(gameManager.getGridState()[0][0], TileState.VISITED);
+        assertEquals(gameManager.getTiles()[0][0].getState(), TileState.VISITED);
     }
 
     @Test

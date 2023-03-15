@@ -21,7 +21,12 @@ public class Controller {
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private GamesManager manager;
 
-    private Controller() {}
+    private Controller() {
+    }
+
+    public static Controller get() {
+        return instance;
+    }
 
     public void initialize() {
         manager = new GamesManager();
@@ -59,9 +64,6 @@ public class Controller {
             result.complete(output);
         });
         return result;
-    }
-    public static Controller get() {
-        return instance;
     }
 
     public CompletableFuture<Map<String, Object>> handleActionRequest(String roomId, String action, int xCoordinate, int yCoordinate) {

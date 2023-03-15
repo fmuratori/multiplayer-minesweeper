@@ -4,7 +4,8 @@ public class PlayersCountObject {
 
     private int connectedCount;
 
-    public PlayersCountObject() {}
+    public PlayersCountObject() {
+    }
 
     public PlayersCountObject(int count) {
         super();
