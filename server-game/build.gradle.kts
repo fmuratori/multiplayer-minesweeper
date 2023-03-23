@@ -11,10 +11,8 @@ repositories {
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-
     implementation("io.vertx:vertx-core:4.3.4")
     implementation("io.vertx:vertx-web:4.3.4")
-
     implementation("com.corundumstudio.socketio:netty-socketio:1.7.19")
 }
 
@@ -32,16 +30,15 @@ tasks.test {
 
 tasks.withType<Test> {
     jacoco {
-        // Enable code coverage for tests
         enabled = true
     }
 }
 
 tasks.test {
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+    finalizedBy(tasks.jacocoTestReport)
 }
 tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
+    dependsOn(tasks.test)
 }
 jacoco {
     toolVersion = "0.8.8"
