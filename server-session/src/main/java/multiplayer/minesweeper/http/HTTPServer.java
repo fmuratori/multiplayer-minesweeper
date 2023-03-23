@@ -12,6 +12,8 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CorsHandler;
 import multiplayer.minesweeper.Controller;
 
+import java.util.Map;
+
 public class HTTPServer extends AbstractVerticle {
     private final Router router;
     private final int port;
@@ -46,9 +48,9 @@ public class HTTPServer extends AbstractVerticle {
                     throw new IllegalArgumentException();
                 }
 
-                Controller.get().handleNewSessionRequest(sessionName, mode, numPlayers, gridWidth, gridHeight).thenApply((String result) -> {
+                Controller.get().handleNewSessionRequest(sessionName, mode, numPlayers, gridWidth, gridHeight).thenApply((Map<String,Object> result) -> {
                     JsonObject sessionJson = new JsonObject()
-                            .put("roomId", result)
+                            .put("roomId", result.get("roomId"))
                             .put("sessionName", sessionName);
                     rc.response()
                             .setStatusCode(200)

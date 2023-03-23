@@ -30,13 +30,9 @@ public class SocketServer {
         browseNamespace = server.addNamespace("/browse");
 
         // handlers
-        sessionNamespace.addConnectListener((client) -> {
-            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Connected to namespace /session");
-        });
+        sessionNamespace.addConnectListener((client) -> System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Connected to namespace /session"));
 
-        sessionNamespace.addDisconnectListener(client -> {
-            System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Disconnected from namespace /session");
-        });
+        sessionNamespace.addDisconnectListener(client -> System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Disconnected from namespace /session"));
 
         sessionNamespace.addEventListener("join_room", JoinRoomMessage.class, (client, data, ackSender) -> {
             System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - " + data.toString());
@@ -123,13 +119,13 @@ public class SocketServer {
         });
     }
 
-    public void sendGameStartingMessage(Session session, String sessionRoomName, String gameRoomName) {
+    public void emitGameStartingMessage(Session session, String sessionRoomName, String gameRoomName) {
         sessionNamespace
                 .getRoomOperations(sessionRoomName)
                 .sendEvent("game_starting", new GameStartingMessage(gameRoomName, session));
     }
 
-    public void sendGameStartingError(String sessionRoomName) {
+    public void emitGameStartingError(String sessionRoomName) {
         sessionNamespace
                 .getRoomOperations(sessionRoomName)
                 .sendEvent("session_error", new SessionErrorMessage("Game server unreachable"));

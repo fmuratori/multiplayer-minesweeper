@@ -24,6 +24,7 @@ public class Controller {
     private SocketServer socketServer;
 
     private Controller() {
+        sessionsManager = new SessionsManager();
     }
 
     public static Controller get() {
@@ -32,7 +33,6 @@ public class Controller {
 
     public void initialize() {
         var vertx = Vertx.vertx();
-        sessionsManager = new SessionsManager();
         httpClient = new HTTPClient(vertx, GAME_SERVER_HOST, GAME_SERVER_PORT);
         new HTTPServer(vertx, HTTP_SERVER_PORT);
         socketServer = new SocketServer(SOCKET_SERVER_PORT);
@@ -40,39 +40,41 @@ public class Controller {
 
     // HTTP client/server methods
     public void handleGameStarting(String sessionRoomName, String gameRoomName) {
-        executor.execute(() -> {
-            sessionsManager.getSession(sessionRoomName)
-                    .ifPresent(value -> socketServer.sendGameStartingMessage(value, sessionRoomName, gameRoomName));
-        });
+        executor.execute(() -> sessionsManager.getSession(sessionRoomName)
+                .ifPresent(value -> socketServer.emitGameStartingMessage(value, sessionRoomName, gameRoomName)));
     }
 
     public void handleGameStartingError(String sessionRoomName) {
         executor.execute(() -> {
             sessionsManager.removeSession(sessionRoomName);
-            socketServer.sendGameStartingError(sessionRoomName);
+            socketServer.emitGameStartingError(sessionRoomName);
         });
     }
 
-    public CompletableFuture<String> handleNewSessionRequest(String sessionName, String mode, int numPlayers, int gridWidth, int gridHeight) {
-        var result = new CompletableFuture<String>();
+    public CompletableFuture<Map<String, Object>> handleNewSessionRequest(String sessionName, String mode, int numPlayers, int gridWidth, int gridHeight) {
+        var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
+            var output = new HashMap<String, Object>();
             var roomId = UUID.randomUUID().toString();
-            var newSession = sessionsManager.addSession(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
+            output.put("status", "CREATED");
+            output.put("roomId", roomId);
 
-            if (numPlayers > 1)
+            var newSession = sessionsManager
+                    .addSession(roomId, sessionName, mode, numPlayers, gridWidth, gridHeight);
+            if (numPlayers > 1 &&  socketServer != null)
                 socketServer.emitSessionUpdate(newSession);
 
-            result.complete(roomId);
+            result.complete(output);
         });
         return result;
     }
 
     // Socket.IO methods
-    public CompletableFuture<Map<String, Object>> handleJoinSession(String roomName) {
+    public CompletableFuture<Map<String, Object>> handleJoinSession(String roomId) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
             var output = new HashMap<String, Object>();
-            var session = sessionsManager.getSession(roomName);
+            var session = sessionsManager.getSession(roomId);
             if (session.isEmpty()) {
                 output.put("status", "NO_SESSION");
             } else if (session.get().isFull()) {
@@ -82,8 +84,9 @@ public class Controller {
                 output.put("session", session.get());
                 output.put("num_connections", session.get().getNumConnectedUsers());
 
-                if (session.get().canStartGame()) {
-                    httpClient.sendGameRequest(roomName, session.get());
+                if (session.get().checkStartCondition()) {
+                    if (httpClient != null)
+                        httpClient.sendGameRequest(roomId, session.get());
                     output.put("status", "GAME_STARTING");
                 } else {
                     output.put("status", "JOINED");
@@ -99,12 +102,12 @@ public class Controller {
         socketServer.emitGameStartingFromTimer(session);
     }
 
-    public CompletableFuture<Map<String, Object>> handleLeaveSession(String roomName) {
+    public CompletableFuture<Map<String, Object>> handleLeaveSession(String roomId) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
             var output = new HashMap<String, Object>();
 
-            Optional<Session> session = sessionsManager.getSession(roomName);
+            Optional<Session> session = sessionsManager.getSession(roomId);
             if (session.isEmpty()) {
                 output.put("status", "NO_SESSION");
             } else if (session.get().isEmpty()) {
@@ -121,9 +124,7 @@ public class Controller {
 
     public CompletableFuture<List<Session>> handleNewConnection() {
         var result = new CompletableFuture<List<Session>>();
-        executor.execute(() -> {
-            result.complete(sessionsManager.getOpenSessions());
-        });
+        executor.execute(() -> result.complete(sessionsManager.getOpenSessions()));
         return result;
     }
 }

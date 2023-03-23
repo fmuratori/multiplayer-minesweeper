@@ -1,4 +1,4 @@
-package multiplayer;
+package multiplayer.minesweeper;
 
 import multiplayer.minesweeper.sessions.Session;
 import multiplayer.minesweeper.sessions.SessionsManager;
