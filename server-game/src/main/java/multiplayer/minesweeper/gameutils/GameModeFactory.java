@@ -14,7 +14,7 @@ public class GameModeFactory {
     }
 
     public static GameMode bigGrid() {
-        return new GameMode("LARGE", 30, 16, 2, 90);
+        return new GameMode("LARGE", 30, 16, 4, 90);
     }
 
     public static GameMode testGrid(int width, int height) {

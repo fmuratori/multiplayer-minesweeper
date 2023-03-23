@@ -41,7 +41,7 @@ public class TestGamesManager {
 
     @Test
     void testGamePlayersCreation() {
-        String gameId = gamesManager.newGame(GameModeFactory.smallGrid());
+        String gameId = gamesManager.newGame(GameModeFactory.mediumGrid());
 
         UUID player1 = UUID.randomUUID();
         UUID player2 = UUID.randomUUID();
@@ -61,15 +61,13 @@ public class TestGamesManager {
 
     @Test
     void testGamePlayersDeletion() {
-        String gameId = gamesManager.newGame(GameModeFactory.smallGrid());
+        String gameId = gamesManager.newGame(GameModeFactory.mediumGrid());
 
         UUID player1 = UUID.randomUUID();
 
         var optGame = gamesManager.getGameInstance(gameId);
         if (optGame.isPresent()) {
             var game = optGame.get();
-            assertFalse(game.containsPlayer(player1));
-            game.removePlayer(player1);
             assertFalse(game.containsPlayer(player1));
 
             game.addPlayer(player1);

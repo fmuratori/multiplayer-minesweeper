@@ -55,12 +55,8 @@ public class TestGameConcurrent {
             List<Pair<Integer, Integer>> player1Actions = actions.subList(0, actions.size() / 2);
             List<Pair<Integer, Integer>> player2Actions = actions.subList(actions.size() / 2, actions.size() );
 
-            Thread t1 = new Thread(() -> {
-                player1Actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT));
-            });
-            Thread t2 = new Thread(() -> {
-                player2Actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT));
-            });
+            Thread t1 = new Thread(() -> player1Actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT)));
+            Thread t2 = new Thread(() -> player2Actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT)));
             t1.start();
             t2.start();
 
@@ -75,12 +71,8 @@ public class TestGameConcurrent {
     void testConcurrentWithOverlap() throws InterruptedException {
         for (int i = 0; i < NUM_CHECKS; i++) {
             Collections.shuffle(actions);
-            Thread t1 = new Thread(() -> {
-                actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT));
-            });
-            Thread t2 = new Thread(() -> {
-                actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT));
-            });
+            Thread t1 = new Thread(() -> actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT)));
+            Thread t2 = new Thread(() -> actions.forEach(p -> game.action(p.x, p.y, ActionType.VISIT)));
             t1.start();
             t2.start();
 

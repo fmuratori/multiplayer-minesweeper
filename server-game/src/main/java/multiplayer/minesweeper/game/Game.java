@@ -258,7 +258,7 @@ public class Game {
         return String.join(" ", output);
     }
 
-    public void resetGame() {
+    public synchronized void resetGame() {
         gameLostFlag = false;
         gameOverFlag = false;
         firstActionFlag = true;
@@ -271,43 +271,49 @@ public class Game {
         }
     }
 
-    public Tile[][] getTiles() {
+    public synchronized Tile[][] getTiles() {
         return tiles;
     }
 
-    public void addPlayer(UUID newPlayerId) {
-        connectedPlayers.add(newPlayerId);
+    public synchronized void addPlayer(UUID newPlayerId) throws IllegalStateException {
+        if (connectedPlayers.size() >= gameMode.getNumPlayers())
+            throw new IllegalStateException("Game is already full");
+        else
+            connectedPlayers.add(newPlayerId);
     }
 
-    public boolean containsPlayer(UUID playerId) {
+    public synchronized boolean containsPlayer(UUID playerId) {
         return connectedPlayers.contains(playerId);
     }
 
-    public void removePlayer(UUID playerId) {
-        connectedPlayers.remove(playerId);
+    public synchronized void removePlayer(UUID playerId) throws IllegalArgumentException {
+        if (!connectedPlayers.contains(playerId))
+            throw new IllegalArgumentException("Player not found");
+        else
+            connectedPlayers.remove(playerId);
     }
 
-    public int getConnectedPlayersCount() {
+    public synchronized int getConnectedPlayersCount() {
         return connectedPlayers.size();
     }
 
-    public GameMode getGameMode() {
+    public synchronized GameMode getGameMode() {
         return gameMode;
     }
 
-    public String getStartedAt() {
+    public synchronized String getStartedAt() {
         return startedAt.toString();
     }
 
-    public long getDuration() {
+    public synchronized long getDuration() {
         return duration.toMillis();
     }
 
-    public boolean isOver() {
+    public synchronized boolean isOver() {
         return gameOverFlag;
     }
 
-    public boolean isLost() {
+    public synchronized boolean isLost() {
         return gameLostFlag;
     }
 }

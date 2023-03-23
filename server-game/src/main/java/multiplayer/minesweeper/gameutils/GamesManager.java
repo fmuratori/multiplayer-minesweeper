@@ -13,7 +13,7 @@ public class GamesManager {
     public GamesManager() {
     }
 
-    public String newGame(GameMode mode) {
+    public synchronized String newGame(GameMode mode) {
         String gameId = UUID.randomUUID().toString();
         Game newInstance = new Game(mode);
         newInstance.initialize();
@@ -21,7 +21,7 @@ public class GamesManager {
         return gameId;
     }
 
-    public void deleteGame(String roomId) {
+    public synchronized void deleteGame(String roomId) {
         activeGames.remove(roomId);
     }
 
@@ -33,7 +33,7 @@ public class GamesManager {
 
     }
 
-    public Optional<String> findGameByUser(UUID playerId) {
+    public synchronized Optional<String> findGameByUser(UUID playerId) {
         for (Map.Entry<String, Game> elem : activeGames.entrySet()) {
             if (elem.getValue().containsPlayer(playerId)) {
                 return Optional.of(elem.getKey());
@@ -42,7 +42,7 @@ public class GamesManager {
         return Optional.empty();
     }
 
-    public Map<String, Game> getActiveGames() {
+    public synchronized Map<String, Game> getActiveGames() {
         return activeGames;
     }
 }

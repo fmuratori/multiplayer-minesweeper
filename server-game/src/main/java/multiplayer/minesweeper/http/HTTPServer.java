@@ -88,11 +88,12 @@ public class HTTPServer extends AbstractVerticle {
     @Override
     public void start() {
         Router router = Router.router(vertx);
-
+        
         router.route().handler(
                 CorsHandler.create(".*.")
                         .allowedMethod(HttpMethod.GET)
-                        .allowedMethod(HttpMethod.POST));
+                        .allowedMethod(HttpMethod.POST)
+                        .allowedHeader("Content-Type"));
 
         router.post("/new-game").handler(this::createNewGame);
         router.get("/game-modes").handler(this::getGameModes);

@@ -19,9 +19,10 @@ public class Controller {
     final static int HTTP_SERVER_PORT = 8003;
     private static final Controller instance = new Controller();
     private final ExecutorService executor = Executors.newCachedThreadPool();
-    private GamesManager manager;
+    private final GamesManager manager;
 
     private Controller() {
+        manager = new GamesManager();
     }
 
     public static Controller get() {
@@ -29,7 +30,6 @@ public class Controller {
     }
 
     public void initialize() {
-        manager = new GamesManager();
         var socketServer = new SocketServer(SOCKET_SERVER_PORT);
         socketServer.initialize();
         var vertx = Vertx.vertx();
@@ -49,15 +49,19 @@ public class Controller {
                     output.put("status", "GAME_NOT_FOUND");
                 } else {
                     var game = optGame.get();
-                    game.removePlayer(userSessionId);
-                    int connectedClients = game.getConnectedPlayersCount();
-                    if (connectedClients == 0) {
-                        output.put("status", "GAME_DELETED");
-                        manager.deleteGame(roomId.get());
-                    } else {
-                        output.put("connectedClients", connectedClients);
-                        output.put("roomId", roomId);
-                        output.put("status", "USER_REMOVED");
+                    try {
+                        game.removePlayer(userSessionId);
+                        int connectedClients = game.getConnectedPlayersCount();
+                        if (connectedClients == 0) {
+                            output.put("status", "GAME_DELETED");
+                            manager.deleteGame(roomId.get());
+                        } else {
+                            output.put("connectedClients", connectedClients);
+                            output.put("roomId", roomId);
+                            output.put("status", "USER_REMOVED");
+                        }
+                    } catch (IllegalArgumentException e) {
+                        output.put("status", "DISCONNECT_ERROR");
                     }
                 }
             }
@@ -69,8 +73,15 @@ public class Controller {
     public CompletableFuture<Map<String, Object>> handleActionRequest(String roomId, String action, int xCoordinate, int yCoordinate) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
-            var requestedAction = ActionType.valueOf(action);
             var output = new HashMap<String, Object>();
+            ActionType requestedAction = null;
+            try {
+                requestedAction = ActionType.valueOf(action);
+            } catch(IllegalArgumentException e) {
+                output.put("status", "ACTION_ERROR");
+                result.complete(output);
+                return;
+            }
             var optGame = manager.getGameInstance(roomId);
             if (optGame.isEmpty()) {
                 output.put("status", "GAME_NOT_FOUND");
@@ -98,14 +109,19 @@ public class Controller {
             if (optGame.isEmpty()) {
                 output.put("status", "GAME_NOT_FOUND");
             } else {
-                var game = optGame.get();
-                var map = game.toString();
-                game.addPlayer(clientSessionId);
-                output.put("status", "JOINED");
-                output.put("map", map);
-                output.put("startedAt", game.getStartedAt());
-                output.put("gameMode", game.getGameMode());
-                output.put("playersCount", game.getConnectedPlayersCount());
+                try {
+                    var game = optGame.get();
+                    var map = game.toString();
+                    game.addPlayer(clientSessionId);
+                    output.put("status", "JOINED");
+                    output.put("map", map);
+                    output.put("startedAt", game.getStartedAt());
+                    output.put("gameMode", game.getGameMode());
+                    output.put("playersCount", game.getConnectedPlayersCount());
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                    output.put("status", "JOIN_ERROR");
+                }
             }
             result.complete(output);
         });
@@ -120,10 +136,14 @@ public class Controller {
             if (optGame.isEmpty()) {
                 output.put("status", "GAME_NOT_FOUND");
             } else {
-                var game = optGame.get();
-                game.removePlayer(clientSessionId);
-                output.put("status", "LEFT");
-                output.put("playersCount", game.getConnectedPlayersCount());
+                try {
+                    var game = optGame.get();
+                    game.removePlayer(clientSessionId);
+                    output.put("status", "LEFT");
+                    output.put("playersCount", game.getConnectedPlayersCount());
+                } catch (IllegalArgumentException e) {
+                    output.put("status", "LEAVE_ERROR");
+                }
             }
             result.complete(output);
         });

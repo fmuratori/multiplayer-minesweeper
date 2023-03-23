@@ -55,7 +55,7 @@ public class SocketServer {
 
     private void handleClientDisconnect(SocketIOClient client) {
         UUID clientSessionId = client.getSessionId();
-        Controller.get().handleClientDisconnect(clientSessionId).thenApply((Map<String, Object> object) -> {
+        Controller.get().handleClientDisconnect(clientSessionId).thenAccept((Map<String, Object> object) -> {
             var status = (String) object.get("status");
             String roomId = "";
             int connectedClients = 0;
@@ -75,8 +75,6 @@ public class SocketServer {
                 case "GAME_NOT_FOUND":
                     System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game for client " + client.getSessionId() + " not found");
             }
-
-            return object;
         });
     }
 
@@ -88,7 +86,7 @@ public class SocketServer {
         }
 
         Controller.get().handleActionRequest(roomId.get(), data.getAction(), data.getxCoordinate(), data.getyCoordinate())
-                .thenApply((Map<String, Object> object) -> {
+                .thenAccept((Map<String, Object> object) -> {
                     var status = (String) object.get("status");
                     if (status.equals("GAME_NOT_FOUND")) {
                         System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game not found");
@@ -112,12 +110,11 @@ public class SocketServer {
                                 break;
                         }
                     }
-                    return object;
                 });
     }
 
     private void handleJoinRoomRequest(SocketIOClient client, JoinRoomMessage data) {
-        Controller.get().handleJoinRoomRequest(data.getRoomName(), client.getSessionId()).thenApply((Map<String, Object> object) -> {
+        Controller.get().handleJoinRoomRequest(data.getRoomName(), client.getSessionId()).thenAccept((Map<String, Object> object) -> {
             var status = (String) object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {
                 System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game not found");
@@ -136,12 +133,11 @@ public class SocketServer {
                 server.getRoomOperations(data.getRoomName()).sendEvent("players_count_update",
                         new PlayersCountMessage(playersCount));
             }
-            return object;
         });
     }
 
     private void handleLeaveRoomRequest(SocketIOClient client, LeaveRoomMessage data) {
-        Controller.get().handleLeaveRoomRequest(data.getRoomName(), client.getSessionId()).thenApply((Map<String, Object> object) -> {
+        Controller.get().handleLeaveRoomRequest(data.getRoomName(), client.getSessionId()).thenAccept((Map<String, Object> object) -> {
             var status = (String) object.get("status");
             if (status.equals("GAME_NOT_FOUND")) {
                 System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Game not found");
@@ -151,7 +147,6 @@ public class SocketServer {
                 server.getRoomOperations(data.getRoomName()).sendEvent("players_count_update",
                         new PlayersCountMessage(playersCount));
             }
-            return object;
         });
     }
 }
