@@ -13,6 +13,12 @@ import multiplayer.minesweeper.websocket.out.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is dedicated to the management of a Socket.IO server which links the web applications
+ * opened by players to sessions functionalities.
+ * 
+ * Here are implemented the behaviours of message requests and responses (both broadcast and single channels responses)
+ */
 public class SocketServer {
     private final SocketIOServer server;
     private final SocketIONamespace browseNamespace;
@@ -119,22 +125,51 @@ public class SocketServer {
         });
     }
 
+    /**
+     * Given a specific session, all the users connected to the corresponding socket.io room are updated when a game
+     * is ready to be played.
+     *
+     * @param session the specific Session object containing additional information about the game configuration
+     * @param sessionRoomName the session identifier, used to match a Session object with a Socket.IO room
+     * @param gameRoomName the newly created game room, users can contact the games service Socket.IO on a
+     *                     specific room
+     */
     public void emitGameStartingMessage(Session session, String sessionRoomName, String gameRoomName) {
         sessionNamespace
                 .getRoomOperations(sessionRoomName)
                 .sendEvent("game_starting", new GameStartingMessage(gameRoomName, session));
     }
 
+    /**
+     * Whenever a game creation error is generated and the players of a session cannot continue in the standard
+     * but have to be redirected to the main page.
+     *
+     * @param sessionRoomName the session identifier, used to match a Session object with a Socket.IO room
+     */
     public void emitGameStartingError(String sessionRoomName) {
         sessionNamespace
                 .getRoomOperations(sessionRoomName)
                 .sendEvent("session_error", new SessionErrorMessage("Game server unreachable"));
     }
 
+    /**
+     * Method called when the state of a session changes. The state can change when a player joins or leaves the
+     * session. Otehr players must be updated of the new state.
+     *
+     * @param session the specific Session object containing additional information about the game configuration
+     *                and the number of currently participating players
+     */
     public void emitSessionUpdate(Session session) {
         browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateMessage(session, SessionUpdateType.NEW_SESSION));
     }
 
+    /**
+     * Utility method used to pilot the creation of a game if a specific session start strategy has been selected.
+     * As soon as a timer expires, a game is started without waiting for other players to join.
+     *
+     * @param session the specific Session object containing additional information about the game configuration
+     *                and the number of currently participating players
+     */
     public void emitGameStartingFromTimer(Session session) {
         browseNamespace.getBroadcastOperations().sendEvent("session_update", new SessionUpdateMessage(session, SessionUpdateType.GAME_STARTING));
     }

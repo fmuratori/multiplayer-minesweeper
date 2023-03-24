@@ -9,6 +9,12 @@ In particular, the goal of this project is to allow multiple users to play the s
 
 The learning goals of this project is to experiment with the distributed systems concept and find solutions to allow a shared game state, consistent and available to multiple users. Another interesting aspect of the development is the integration of the software with technologies such as Docker and GitLab CI/CD.
 
+# SESSIONS AND GAME APIs SPECFICATIONS
+For the sessions service APIs, the endpoints specifications are visible at the following link:
+[SwaggerHub](https://app.swaggerhub.com/apis/fmuratori/multiplayer-minesweeper-sessions-service/1.0.0)
+
+For the games service APIs, the endpoints specifications are visible at the following link:
+[SwaggerHub](https://app.swaggerhub.com/apis/fmuratori/multiplayer-minesweeper-game-service/1.0.0)
 # HOW TO RUN
 
 The platform can be run in 3 different ways:

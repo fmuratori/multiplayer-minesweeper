@@ -17,6 +17,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * This class is dedicated to the management of a Socket.IO server which links the web applications
+ * opened by players to the game core functionalities.
+ *
+ * Here are implemented the behaviours of message requests and responses (both broadcast and single channels responses)
+ */
 public class SocketServer {
     private final Configuration config;
     private final int port;
@@ -28,6 +34,9 @@ public class SocketServer {
         config.setPort(port);
     }
 
+    /**
+     * Initializes the server behaviours to execute when messages are received.
+     */
     public void initialize() {
         server = new SocketIOServer(config);
         server.addConnectListener((client) -> System.out.println("[Socket.IO] - Socket ID [" + client.getSessionId().toString() + "] - Connected to socket"));

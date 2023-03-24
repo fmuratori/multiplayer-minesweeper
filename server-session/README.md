@@ -8,7 +8,7 @@ Here the matchmaking and "waiting rooms" logic of the application are handled an
 
 # API specification
 
-[SwaggerHub](https://app.swaggerhub.com/apis/fmuratori/multiplayer-minesweeper-session-service/1.0.0)
+[SwaggerHub](https://app.swaggerhub.com/apis-docs/fmuratori/multiplayer-minesweeper-session-service/1.0.0)
 
 ---
 

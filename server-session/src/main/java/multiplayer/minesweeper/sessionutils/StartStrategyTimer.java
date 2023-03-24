@@ -3,6 +3,10 @@ package multiplayer.minesweeper.sessionutils;
 import multiplayer.minesweeper.Controller;
 import multiplayer.minesweeper.sessions.Session;
 
+/**
+ * Implementation of a game starting policy. In this case, a game starts only after a certain amount of time has
+ * elapsed from the initialization of a session.
+ */
 public class StartStrategyTimer implements StartStrategy {
     private boolean condition = false;
     public StartStrategyTimer(Session session, long waitTime) {

@@ -163,7 +163,6 @@ public class Game {
                         Pair<Integer, Integer> point = findEmptyTile();
                         if (point != null) {
                             tiles[point.x][point.y].setContent(TileContent.MINE);
-                            ;
                         }
 
                         //move the mine somewhere else

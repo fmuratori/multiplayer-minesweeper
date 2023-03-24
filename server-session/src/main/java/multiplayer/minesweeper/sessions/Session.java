@@ -5,6 +5,14 @@ import multiplayer.minesweeper.sessionutils.StartStrategyMaxPlayers;
 
 import java.util.Date;
 
+/**
+ * This class represents a session of players. Whenever players are waiting for a game to start,
+ * a session object is initialized. Interestingly, no data or identifier about the players is kept.
+ * They are grouped together thanks to the Socket.IO rooms logic. Here only the Socket.IO room id is needed.
+ *
+ * Also, a Session starting logic may vary from game mode to game mode. The starting logic is refactored
+ * with a Strategy design pattern.
+ */
 public class Session {
     private final String roomId;
     private final String sessionName;

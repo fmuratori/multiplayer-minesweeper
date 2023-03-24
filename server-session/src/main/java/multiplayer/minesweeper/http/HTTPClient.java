@@ -8,6 +8,10 @@ import io.vertx.ext.web.client.WebClientOptions;
 import multiplayer.minesweeper.Controller;
 import multiplayer.minesweeper.sessions.Session;
 
+/**
+ * Http client class. This class handles the request of a new game initialization from the
+ * games service.
+ */
 public class HTTPClient {
     private final WebClient client;
     private final int serverPort;
@@ -20,6 +24,12 @@ public class HTTPClient {
         this.serverHost = serverHost;
     }
 
+    /**
+     * Sends a new game request to the games service http server.
+     *
+     * @param sessionRoomName the session identifier
+     * @param session the Session class instance that is ready to be started.
+     */
     public void sendGameRequest(String sessionRoomName, Session session) {
         client.post(serverPort, serverHost, "/new-game").sendJsonObject(new JsonObject().put("name", session.getGameMode()))
                 .onSuccess(response -> handleGameResponse(response.statusCode(), response.body(), sessionRoomName))

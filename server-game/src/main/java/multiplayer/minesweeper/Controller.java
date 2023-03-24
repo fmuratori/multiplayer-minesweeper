@@ -14,6 +14,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * This class is the link between the network interfaces contained in the http and websocket packages and the core
+ * components of the service. This class implements a Singleton design pattern and is accessible form any point
+ * in the project.
+ *
+ * Internally, the Controller implements its logic using the Promise mechanism. Every request is handled
+ * asynchronously from the caller and execution is demanded to a pool of worker threads.
+ */
 public class Controller {
     final static int SOCKET_SERVER_PORT = 8004;
     final static int HTTP_SERVER_PORT = 8003;
@@ -25,10 +33,18 @@ public class Controller {
         manager = new GamesManager();
     }
 
+    /**
+     * Getter of the singleton instance of this class.
+     * @return the Controller object
+     */
     public static Controller get() {
         return instance;
     }
 
+    /**
+     * Method dedicated to the initialization of the web interfaces components, mainly an HTTP client, an http server
+     * and a Socket.IO server.
+     */
     public void initialize() {
         var socketServer = new SocketServer(SOCKET_SERVER_PORT);
         socketServer.initialize();
@@ -36,6 +52,13 @@ public class Controller {
         new HTTPServer(vertx, HTTP_SERVER_PORT);
     }
 
+    /**
+     * Method called whenever an existing Socket.IO connection is lost. The user identified its id will be
+     * removed from the corresponding game instance.
+     *
+     * @param userSessionId the users who losts the connections with this service
+     * @return a CompletableFuture object which will eventually provide the result of the request
+     */
     public CompletableFuture<Map<String, Object>> handleClientDisconnect(UUID userSessionId) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
@@ -70,6 +93,15 @@ public class Controller {
         return result;
     }
 
+    /**
+     * Method called whenever a users requires the execution of an action on a game instance.
+     *
+     * @param roomId the game id. This id also matches with a Socket.IO room id
+     * @param action the action requested by the player
+     * @param xCoordinate the x coordinate at which apply the action
+     * @param yCoordinate the y coordinate at witch apply the action
+     * @return  a CompletableFuture object which will eventually provide the result of the request
+     */
     public CompletableFuture<Map<String, Object>> handleActionRequest(String roomId, String action, int xCoordinate, int yCoordinate) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
@@ -101,6 +133,14 @@ public class Controller {
         return result;
     }
 
+
+    /**
+     * This method implements the logic behind the join to a specific game instance by a player
+     *
+     * @param roomId the specific game id the users wants to join. This id matches with the Socket.IO room identifier.
+     * @param clientSessionId the specific user id. This id matches with the user's Socket.IO channel id
+     * @return a CompletableFuture object which will eventually provide the result of the request
+     */
     public CompletableFuture<Map<String, Object>> handleJoinRoomRequest(String roomId, UUID clientSessionId) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
@@ -128,6 +168,13 @@ public class Controller {
         return result;
     }
 
+
+    /**
+     * This method implements the logic behind the leave of a specific game requested by a player.
+     *
+     * @param roomId the specific session id the users wants to join
+     * @return a CompletableFuture object which will eventually provide the result of the request
+     */
     public CompletableFuture<Map<String, Object>> handleLeaveRoomRequest(String roomId, UUID clientSessionId) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
@@ -151,6 +198,12 @@ public class Controller {
 
     }
 
+    /**
+     * This method is called whenever a game creation request is received from a HTTPServer object.
+     *
+     * @param gameModeName the game mode of the new game instance
+     * @return a CompletableFuture object which will eventually provide the result of the request
+     */
     public CompletableFuture<Map<String, Object>> handleNewGameRequest(String gameModeName) {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {
@@ -170,6 +223,12 @@ public class Controller {
         return result;
     }
 
+    /**
+     * This method is called whenever a players opens the web app main page and requests the list of available game
+     * modes for the creation of a game.
+     *
+     * @return a CompletableFuture object which will eventually provide the result of the request
+     */
     public CompletableFuture<Map<String, Object>> handleGameModesRequest() {
         var result = new CompletableFuture<Map<String, Object>>();
         executor.execute(() -> {

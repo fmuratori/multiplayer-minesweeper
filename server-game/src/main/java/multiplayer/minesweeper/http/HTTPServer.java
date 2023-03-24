@@ -16,6 +16,11 @@ import multiplayer.minesweeper.Controller;
 
 import java.util.Map;
 
+/**
+ * HTTP server implementation. The server provides two Rest API endpoints for the creation of a
+ * new Game and the available game modes. The specification of this API is visible at:
+ * <a href="https://app.swaggerhub.com/apis-docs/fmuratori/multiplayer-minesweeper-game-service/1.0.0">Open API doc</a>
+ */
 public class HTTPServer extends AbstractVerticle {
     private final int port;
 
@@ -84,7 +89,9 @@ public class HTTPServer extends AbstractVerticle {
         });
     }
 
-
+    /**
+     * Starts the HTTP server.
+     */
     @Override
     public void start() {
         Router router = Router.router(vertx);
