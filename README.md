@@ -35,7 +35,7 @@ docker network create --driver bridge --subnet=172.18.0.0/16 mmnetwork
 
 **STEP 2**
 
-Build and run each container. You can find the `docker build ...` and `docker run ...` commands inside the README.md file of each sibproject folder.  
+Build and run each container. You can find the `docker build ...` and `docker run ...` commands inside the README.md file of each subproject folder.  
 
 
 ## ... OR USE DOCKER COMPOSE
@@ -66,14 +66,14 @@ Hosts configuration:
 - *session* is named `mmsession`
 - *game* is named `mmgame`
 
-Ports configuration for server session:
+Ports configuration for service frontend:
 - port 3000 for HTTP requests
 
-Ports configuration for server session:
+Ports configuration for service session:
 - port 8001 for REST API calls
 - port 8002 for Socket.IO channels
 
-Ports configuration for server game:
+Ports configuration for service game:
 - port 8003 for REST API calls
 - port 8004 for Socket.IO channels
 
