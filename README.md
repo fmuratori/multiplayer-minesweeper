@@ -7,15 +7,18 @@ In particular, the goal of this project is to allow multiple users to play the s
 - a session service implements the waiting phase prior to a match and the synchronous initialization of a particular match;
 - a web based frontend service allows users to acces the game through a simple and intuitive interface.
 
+![Architecture overview](doc/architecture.png)
+
 The learning goals of this project is to experiment with the distributed systems concept and find solutions to allow a shared game state, consistent and available to multiple users. Another interesting aspect of the development is the integration of the software with technologies such as Docker and GitLab CI/CD.
 
-# SESSIONS AND GAME APIs SPECFICATIONS
-For the sessions service APIs, the endpoints specifications are visible at the following link:
-[SwaggerHub](https://app.swaggerhub.com/apis-docs/fmuratori/multiplayer-minesweeper-session-service/1.0.0)
 
-For the games service APIs, the endpoints specifications are visible at the following link:
-[SwaggerHub](https://app.swaggerhub.com/apis-docs/fmuratori/multiplayer-minesweeper-game-service/1.0.0)
-# HOW TO RUN
+## DEMO
+![Home page](doc/home_page.png)
+![Lobby](doc/game_lobby.png)
+![Game](doc/game.png)
+
+
+## HOW TO RUN
 
 The platform can be run in 3 different ways:
 - with independently initialized microservices build on top of automatic build tools such as npm for the frontend and gradle for the session and game services;
@@ -24,7 +27,7 @@ The platform can be run in 3 different ways:
 
 The first approach does not allow the integration of the 3 components since the implementation requires a DNS name resolutor to identify the single hosts IPs. This approach is used to rapidly check tests and builds results.    
 
-## RUN DOCKER CONTAINERS SEPARATELY
+### RUN DOCKER CONTAINERS SEPARATELY
 
 **STEP 1**
 Create a user-defined docker bridge network:
@@ -38,7 +41,7 @@ docker network create --driver bridge --subnet=172.18.0.0/16 mmnetwork
 Build and run each container. You can find the `docker build ...` and `docker run ...` commands inside the README.md file of each subproject folder.  
 
 
-## ... OR USE DOCKER COMPOSE
+### ... OR USE DOCKER COMPOSE
 
 Use docker-compose to start the entire system:
 
@@ -52,7 +55,14 @@ docker compose build --no-cache
 docker compose up
 `
 
-# NOTE
+## SESSIONS AND GAME APIs SPECFICATIONS
+For the sessions service APIs, the endpoints specifications are visible at the following link:
+[SwaggerHub](https://app.swaggerhub.com/apis-docs/fmuratori/multiplayer-minesweeper-session-service/1.0.0)
+
+For the games service APIs, the endpoints specifications are visible at the following link:
+[SwaggerHub](https://app.swaggerhub.com/apis-docs/fmuratori/multiplayer-minesweeper-game-service/1.0.0)
+
+## NOTE
 
 **Containers host configuration**
 
